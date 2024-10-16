@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Note
+from .models import Note, Category, Product, Order, OrderItem, Payment, ShoppingCart
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,4 +17,52 @@ class NoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ["id","title","content","create_at","author"]
         extra_kwarge = {"author": {"write_only":True}}
+
+# Serializer สำหรับหมวดหมู่สินค้า
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'description']
+
+# Serializer สำหรับสินค้า
+class ProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)  # แสดงข้อมูลหมวดหมู่ด้วย
+    
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'image_url', 'created_at']
+
+# Serializer สำหรับการสั่งซื้อสินค้า
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)  # แสดง username แทนข้อมูลผู้ใช้ทั้งหมด
+    items = serializers.StringRelatedField(many=True, read_only=True)  # แสดงรายการสินค้า
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'total_price', 'status', 'created_at', 'items']
+
+# Serializer สำหรับรายการสินค้าที่สั่งซื้อในแต่ละคำสั่งซื้อ
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)  # แสดงข้อมูลสินค้าที่สั่งซื้อ
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'order', 'product', 'quantity', 'price']
+
+# Serializer สำหรับการชำระเงิน
+class PaymentSerializer(serializers.ModelSerializer):
+    order = serializers.StringRelatedField(read_only=True)  # แสดงข้อมูล order แบบ string
+    
+    class Meta:
+        model = Payment
+        fields = ['id', 'order', 'payment_date', 'amount', 'payment_method']
+
+# Serializer สำหรับตะกร้าสินค้า
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)  # แสดงข้อมูลสินค้าในตะกร้า
+    user = serializers.StringRelatedField(read_only=True)  # แสดงข้อมูล user
+    
+    class Meta:
+        model = ShoppingCart
+        fields = ['id', 'user', 'product', 'quantity']
         

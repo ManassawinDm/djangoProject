@@ -5,7 +5,26 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React</title>
+
+    <!-- ติดตั้ง Tailwind CSS ผ่าน CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ติดตั้งฟอนต์ผ่าน Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DIN+Alternate:wght@400;700&display=swap" rel="stylesheet">
+
+    
+    <script>
+      // กำหนด Tailwind CSS Config เพื่อใช้ฟอนต์
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              din: ['DIN Alternate', 'sans-serif'], // ใช้ฟอนต์ DIN หรือ fallback เป็น sans-serif
+            },
+          },
+        },
+      };
+    </script>
   </head>
   <body>
     <div id="root"></div>

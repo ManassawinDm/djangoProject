@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import PreHome from './pages/PreHome'
 function Logout() {
   localStorage.clear()
   return <Navigate to="/login"/>
@@ -23,14 +24,14 @@ function App() {
     <Navbar />
       <Routes>
         <Route
-          path="/"
+          path="/home"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Home/>
-            // </ProtectedRoute> 
+            </ProtectedRoute> 
           }
         />
-
+        <Route path="/" element={<PreHome/>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="/logout" element={<Logout/>}/>
         <Route path="/register" element={<Register/>}/>
