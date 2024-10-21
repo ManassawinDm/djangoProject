@@ -1,8 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { ACCESS_TOKEN,REFRESH_TOKEN } from "../constants"
 function Navbar() {
   const navigate = useNavigate();  // เรียกใช้ useNavigate เพื่อใช้งานในการเปลี่ยน path
+
+  const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
+
+  const handleLogout = () => {
+    localStorage.removeItem(ACCESS_TOKEN);
+    localStorage.removeItem(REFRESH_TOKEN);
+    navigate('/login');  
+  };
 
   return (
     <div className=" relative border-b-4 border-gray-300 bg-gradient-to-r from-red-500 to-red-700 p-4 shadow-lg ">
@@ -66,13 +74,22 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Right Section: Login */}
-        <div
-          className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-          onClick={() => navigate('/login')}
-        >
-          LOGIN
-        </div>
+        {/* Right Section: Login */}     
+        {isLoggedIn ? (
+          <div
+            className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
+            onClick={handleLogout} 
+          >
+            LOGOUT
+          </div>
+        ) : (
+          <div
+            className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
+            onClick={() => navigate('/login')}
+          >
+            LOGIN
+          </div>
+        )}
       </div>
     </div>
   );

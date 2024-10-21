@@ -6,7 +6,9 @@ import Loading from './Loading';
 
 function Form({ route, method }) {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmpassword, setConfirmpassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const name = method === 'login' ? 'Login' : 'Register';
@@ -16,7 +18,8 @@ function Form({ route, method }) {
     e.preventDefault();
 
     try {
-      const res = await api.post(route, { username, password });
+      const payload = method === 'register' ? { username, email, password, confirmpassword } : { username, password };
+      const res = await api.post(route, payload);
       if (method === 'login') {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
@@ -47,6 +50,16 @@ function Form({ route, method }) {
           placeholder="Username"
           required
         />
+        {method === 'register' && (
+          <input
+            className="form-input w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            required
+          />
+        )}
         <input
           className="form-input w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
           type="password"
@@ -55,13 +68,52 @@ function Form({ route, method }) {
           placeholder="Password"
           required
         />
-        {loading && <Loading />}
-        <button
+        {method === 'register' && (
+          <input
+            className="form-input w-full p-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
+            type="password"
+            value={confirmpassword}
+            onChange={(e) => setConfirmpassword(e.target.value)}
+            placeholder="ConfirmPassword"
+            required
+          />
+        )}
+        {loading ? (
+          <button
+          className="form-submit w-full bg-red-300 text-white p-2 rounded hover:bg-red-600 transition-colors"
+          type="submit"
+        >
+          Loading
+        </button>
+        ) : (
+          <button
           className="form-submit w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors"
           type="submit"
         >
           {name}
         </button>
+        )}
+        
+        {method === 'register' ? (
+          <span>
+            <p
+              className="text-blue-500 cursor-pointer hover:underline mt-4 text-center" 
+              onClick={() => navigate('/login')}
+            >
+              มีบัญชีผู้ใช้อยู่แล้ว
+            </p>
+          </span>
+        ) : (
+
+            <span>
+              <p
+                className="text-blue-500 cursor-pointer hover:underline mt-4 text-center"
+                onClick={() => navigate('/register')}
+              >
+                ยังไม่มีบัญชีผู้ใช้งาน
+              </p>
+            </span>
+        )}
       </form>
     </div>
   );

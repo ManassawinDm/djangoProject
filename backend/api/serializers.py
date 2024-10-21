@@ -3,12 +3,28 @@ from rest_framework import serializers
 from .models import Note, Category, Product, Order, OrderItem, Payment, ShoppingCart
 
 class UserSerializer(serializers.ModelSerializer):
+
+    confirmpassword = serializers.CharField(write_only=True)
     class Meta:
         model = User
-        fields = ["id","username","password"]
+        fields = ["id","username","email","password","confirmpassword"]
         extra_kwarge = {"password": {"write_only":True}}
+
+    def validate(self, data):
+        password = data.get('password')
+        confirmpassword = data.get('confirmpassword')
+
+        if not password or not confirmpassword:
+            raise serializers.ValidationError("Both password and confirm password are required.")
+        
+
+        if password != confirmpassword:
+            raise serializers.ValidationError({"password": "Passwords do not match."})
+        
+        return data
         
     def create(self, validated_data):
+        validated_data.pop('confirmpassword')
         user = User.objects.create_user(**validated_data)
         return user
     
