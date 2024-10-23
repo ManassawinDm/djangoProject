@@ -14,9 +14,10 @@ function PreHome() {
         getProduct();
     },[])
 
-    const handleImageClick = () => {
-        navigate('/login');
+    const handleImageClick = (productID) => {
+        navigate(`/product?productId:${productID}`);
       };
+      
 
     const getProduct = async () => {
         try {
@@ -39,7 +40,7 @@ function PreHome() {
                     <ul className="grid grid-cols-5 gap-6 ">
                         {products.map((product) => (
                             <li key={product.id} className="text-left mb-16">
-                                <button onClick={handleImageClick}>
+                                <button onClick={() => handleImageClick(product.id)}>
                                     <img 
                                         src={product.image_url} 
                                         alt={product.name} 
