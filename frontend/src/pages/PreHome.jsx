@@ -15,8 +15,9 @@ function PreHome() {
     },[])
 
     const handleImageClick = (productID) => {
-        navigate(`/product?productId:${productID}`);
+        navigate(`/product?productId=${productID}`);
       };
+      
       
 
     const getProduct = async () => {
