@@ -24,7 +24,7 @@ function Navbar() {
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
   const decodedToken = isLoggedIn ? decodeToken(token) : null;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState(null);
+  const [selectedFeature, setSelectedFeature] = useState('SERIES');
   const [Category, setCategory] = useState([]);
 
   useEffect(() => {
@@ -32,15 +32,18 @@ function Navbar() {
   }, [])
 
   // Dummy data
-  const dummyData = [...Array(15).keys()].map(i => ({
-    id: i,
-    title: `Dummy Item ${i + 1}`,
-    description: `This is the description for item ${i + 1}`
+  const CategoryData = Category.map((value) => ({
+    id: value.id,
+    name: value.name,
+    description: value.description,
+    image_url: value.image_url
   }));
+
 
   // Handle feature selection
   const handleFeatureClick = (feature) => {
     setSelectedFeature(feature);
+    console.log(feature)
   };
 
   const handleLogout = () => {
@@ -107,21 +110,21 @@ function Navbar() {
           <div className="hidden sm:flex space-x-2 sm:space-x-6">
             <div
               className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-              onClick={() => navigate("/feature1")}
+              onClick={() => navigate("/MEGA")}
             >
-              Feature1
+              MEGA
             </div>
             <div
               className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-              onClick={() => navigate("/feature2")}
+              onClick={() => navigate("/TYPE")}
             >
-              Feature2
+              TYPE
             </div>
             <div
               className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-              onClick={() => navigate("/feature3")}
+              onClick={() => navigate("/ACCESSORIES")}
             >
-              Feature3
+              ACCESSORIES
             </div>
           </div>
 
@@ -133,52 +136,70 @@ function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="sm:hidden absolute top-16 left-0 w-full h-screen bg-gradient-to-r from-red-500 to-red-700 shadow-lg p-4">
-            <div className="grid grid-cols-3 gap-4 h-screen">
+          <div className="border-t-2 border-red-600 sm:hidden absolute top-16 left-0 w-full h-screen bg-gradient-to-r from-red-500 to-red-700 shadow-lg">
+            <div className="grid grid-cols-3  h-screen">
 
               {/* Feature List Section */}
-              <div className="bg-orange-400 col-span-1 p-2">
-                <ul className="space-y-4">
+              <div className="bg-slate-200 col-span-1  text-black">
+                <ul className="">
                   <li
-                    className="text-white font-semibold text-lg cursor-pointer"
+                    className={`py-4 pl-2  font-bold text-lg cursor-pointer ${selectedFeature === "SERIES" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                      }`}
                     onClick={() => handleFeatureClick("SERIES")}
                   >
                     SERIES
                   </li>
+
                   <li
-                    className="text-white font-semibold text-lg cursor-pointer"
-                    onClick={() => handleFeatureClick("Feature1")}
+                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === "MEGA" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                    }`}
+                    onClick={() => handleFeatureClick("MEGA")}
                   >
-                    Feature1
+                    MEGA
                   </li>
                   <li
-                    className="text-white font-semibold text-lg cursor-pointer"
-                    onClick={() => handleFeatureClick("Feature2")}
+                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === "TYPES" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                    }`}
+                    onClick={() => handleFeatureClick("TYPES")}
                   >
-                    Feature2
+                    TYPES
                   </li>
                   <li
-                    className="text-white font-semibold text-lg cursor-pointer"
-                    onClick={() => handleFeatureClick("Feature3")}
+                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === "ACCESSORIES" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                    }`}
+                    onClick={() => handleFeatureClick("ACCESSORIES")}
                   >
-                    Feature3
+                    ACCESSORIES
                   </li>
                 </ul>
               </div>
 
               {/* Detail Section */}
-              <div className="bg-blue-400 col-span-2 p-4 flex flex-col items-center text-white font-semibold text-lg relative overflow-y-auto">
-                <h2 className="text-2xl mb-4">{selectedFeature || "Select a feature"}</h2>
+              <div className="bg-white col-span-2 p-4 flex flex-col text-white font-semibold text-lg relative overflow-y-auto">
+
                 {selectedFeature && (
-                  <ul className="space-y-2">
-                    {dummyData.map(item => (
-                      <li key={item.id} className="bg-white text-gray-800 p-2 rounded shadow">
-                        <h3 className="font-bold">{item.title}</h3>
-                        <p>{item.description}</p>
-                      </li>
-                    ))}
+                  <ul className="">
+                    {selectedFeature === "SERIES"
+                      ? CategoryData.map((item) => (
+                        <li
+                          key={item.id}
+                          className=" text-gray-800 p-4 flex items-center space-x-4"
+                        >
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="h-16 w-16 object-cover rounded-full shadow-lg"
+                          />
+                          <div className="flex-1">
+                            <h3 className="font-bold text-lg">{item.name}</h3>
+                          </div>
+                        </li>
+                      ))
+                      : null}
                   </ul>
                 )}
+
+
               </div>
             </div>
           </div>
