@@ -1,15 +1,33 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
-function Navbar() {
-  const navigate = useNavigate(); // เรียกใช้ useNavigate เพื่อใช้งานในการเปลี่ยน path
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ACCESS_TOKEN,REFRESH_TOKEN } from "../constants"
 
+function decodeToken(token) {
+  try {
+    const base64Url = token.split('.')[1]; 
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); 
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    
+    return JSON.parse(jsonPayload); 
+  } catch (error) {
+    console.error("Invalid token", error);
+    return null;
+  }
+}
+
+function Navbar() {
+  const navigate = useNavigate();  // เรียกใช้ useNavigate เพื่อใช้งานในการเปลี่ยน path
+  const token = localStorage.getItem(ACCESS_TOKEN);
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
+  const decodedToken = isLoggedIn ? decodeToken(token) : null;
+  console.log(decodedToken)
 
   const handleLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
-    navigate("/login");
+    navigate('/login');  
   };
 
   return (
@@ -75,7 +93,8 @@ function Navbar() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4 ml-auto mr-3">
+        {isLoggedIn &&(
+          <div className="flex items-center space-x-4 ml-auto mr-3">
           <button
             type="button"
             className="relative inline-flex items-center px-4 py-2 text-sm text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full hover:from-red-500 hover:to-red-800 focus:ring-4 focus:ring-red-300 shadow-lg transition duration-300 transform hover:scale-105"
@@ -104,10 +123,11 @@ function Navbar() {
             </svg>
 
             <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2">
-              8
+              0
             </div>
           </button>
         </div>
+        )}
 
         {/* Right Section: Login */}
         {isLoggedIn ? (
