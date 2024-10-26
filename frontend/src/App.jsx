@@ -8,8 +8,8 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Loading from './components/Loading'
-import ProductDetial from './pages/ProductDetial'
 
+const ProductDetial = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));
 
 function Logout() {
@@ -43,7 +43,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/product" element={<ProductDetial />} />
+        <Route
+          path="/product"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProductDetial />
+            </Suspense>
+          }
+        />
         <Route path="*" element={<Notfound />} />
       </Routes>
       <Footer />

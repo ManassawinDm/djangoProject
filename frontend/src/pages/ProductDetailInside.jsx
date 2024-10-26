@@ -1,8 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import api from '../api';
+import { useLocation } from 'react-router-dom';
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+
 
 function ProductDetailInside() {
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [products, setProducts] = useState([]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const productId = queryParams.get('productId'); // Retrieve the 'productId' query parameter
+  const navigate = useNavigate();
+  const token = localStorage.getItem(ACCESS_TOKEN);
+  const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
+  // const decodedToken = isLoggedIn ? decodeToken(token) : null;
+
+
+  const getProduct = async (productId) => { // Ensure productId is passed as an argument
+    try {
+      const res = await api.post("/product/", { productId }); // Wrap productId in an object
+      const data = res.data; // Extract data from the response
+      setProducts(data); // Set the state with the product data
+    } catch (err) {
+      alert("Error fetching product: " + err.message); // Display a user-friendly error message
+      console.error(err); // Log the error for debugging
+    }
+  };
+
+  // Fetch product data when the component mounts or when productId changes
+  useEffect(() => {
+    if (productId) {
+      getProduct(productId); // Call the function to get the product
+    }
+  }, [productId]);
+
 
   const thumbnails = [...Array(8)].map((_, index) => `src/image/picForNav.jpg`); //Image list
 
@@ -17,12 +50,23 @@ function ProductDetailInside() {
   };
 
   const increment = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1); // List Qty
+    setQuantity((prevQuantity) =>{
+      if (prevQuantity < products.stock) {
+        return prevQuantity + 1; // Increment the quantity
+      }
+      return prevQuantity
+    }
+    )
+    ; // List Qty
   };
 
   const decrement = () => {
-    setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 0));
+    setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 1));
   };
+
+  const AddToCart=()=>{
+    console.log("Add to cart")
+  }
   return (
     <div>
       <div className="bg-gray-100 p-4">
@@ -31,7 +75,7 @@ function ProductDetailInside() {
           <div className="flex flex-col">
             <img
               className="w-full h-auto rounded-lg shadow-md"
-              src="src/image/picForNav.jpg"
+              src={products.image_url}
               alt="Product"
             />
             <div className="flex justify-center mt-4">
@@ -53,7 +97,7 @@ function ProductDetailInside() {
                     <img
                       key={index}
                       className="h-20 w-20 object-cover rounded-lg shadow-md cursor-pointer"
-                      src={src}
+                      src={products.image_url}
                       alt={`Thumbnail ${currentIndex + index}`}
                     />
                   )
@@ -72,8 +116,8 @@ function ProductDetailInside() {
 
           {/* Right Section: Product Details */}
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-2">Product</h1>
-            <p className="text-xl text-red-500">฿380.00</p>
+            <h1 className="text-2xl font-bold mb-2">{products.name}</h1>
+            <p className="text-xl text-red-500">{products.price}</p>
 
             <div className="mt-4">
               <label htmlFor="size" className="block text-lg font-semibold">
@@ -92,6 +136,7 @@ function ProductDetailInside() {
               <label htmlFor="quantity" className="block text-lg font-semibold">
                 จำนวน:
               </label>
+              <p className='text-gray-400'>มีสินค้า: {products.stock} ชิ้น</p>
               <div className="flex items-center space-x-2 mt-2">
                 <button
                   onClick={decrement}
@@ -99,13 +144,16 @@ function ProductDetailInside() {
                 >
                   -
                 </button>
+               
                 <input
                   type="number"
                   id="quantity"
                   value={quantity}
-                  readOnly
+                 
+                  onChange={(e) => setQuantity(e.target.value)} // Assuming you have a setQuantity function to handle changes
                   className="block w-16 text-center p-2 border border-gray-300 rounded-md"
                 />
+
                 <button
                   onClick={increment}
                   className="border border-gray-300 rounded-full px-2 text-lg font-semibold"
@@ -118,6 +166,8 @@ function ProductDetailInside() {
             <button
               type="button"
               className="relative inline-flex justify-center font-semibold mt-6 w-full px-1.5 py-3 text-sm text-white bg-red-600 rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
+              onClick={isLoggedIn ? AddToCart : () => navigate("/login")}
+
             >
               <svg
                 className="w-5 h-5 me-2"
@@ -133,9 +183,8 @@ function ProductDetailInside() {
             {/* Additional Details */}
             <div className="mt-4">
               <h2 className="text-lg font-semibold">รายละเอียดสินค้า</h2>
-              <p className="mt-2">ที่มา: POP MART</p>
-              <p>วัสดุ: PVC/ABS/Hardware/Magnet</p>
-              <p>เหมาะสำหรับอายุ 8-12 ปี</p>
+              <p className="mt-2">{products.description}</p>
+
             </div>
           </div>
         </div>
