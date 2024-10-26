@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ACCESS_TOKEN,REFRESH_TOKEN } from "../constants"
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 
 function decodeToken(token) {
   try {
@@ -18,11 +18,11 @@ function decodeToken(token) {
 }
 
 function Navbar() {
-  const navigate = useNavigate();  // เรียกใช้ useNavigate เพื่อใช้งานในการเปลี่ยน path
+  const navigate = useNavigate();
   const token = localStorage.getItem(ACCESS_TOKEN);
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
   const decodedToken = isLoggedIn ? decodeToken(token) : null;
-  console.log(decodedToken)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
@@ -31,36 +31,37 @@ function Navbar() {
   };
 
   return (
-    <div className=" relative border-b-4 border-gray-300 bg-gradient-to-r from-red-500 to-red-700 p-4 shadow-lg ">
+    <div className="relative border-b-4 border-gray-300 bg-gradient-to-r from-red-500 to-red-700 p-4 shadow-lg relative">
       <div className="flex justify-between items-center max-w-7xl mx-auto ">
-        {/* Left Section: Logo and Series */}
-        <div className="flex items-center space-x-8">
+        {/* Logo */}
+        <div className="flex items-center space-x-4 sm:space-x-8 ">
           <img
-            className="h-20 w-auto cursor-pointer"
+            className="h-12 w-auto cursor-pointer sm:h-20"
             src="src/image/LOGO.webp"
             alt="Logo"
             onClick={() => navigate("/")}
           />
-          <div className=" group">
-            <div className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110 ">
+
+          {/* SERIES Dropdown */}
+          <div className="hidden sm:block group ">
+            <div className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110">
               SERIES
             </div>
-
             <div className="absolute left-0 mt-2 w-screen bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-200 z-50">
               <ul className="grid grid-cols-4 gap-6 text-gray-700 px-24 py-4">
                 {[...Array(15).keys()].map((i) => (
                   <li
                     key={i}
-                    className="hover:bg-gray-100 cursor-pointer text-center p-4 rounded-lg transition duration-150 ease-in-out"
+                    className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
                     onClick={() => navigate(`/series${i}`)}
                   >
                     <div className="flex flex-col items-center">
                       <img
                         src="src/image/picForNav.jpg"
                         alt={`Item ${i}`}
-                        className="h-16 w-16 object-cover rounded-full mb-2 shadow-md"
+                        className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
                       />
-                      <span className="text-sm font-medium text-gray-800">
+                      <span className="text-xs sm:text-sm font-medium text-gray-800">
                         Item{i}
                       </span>
                     </div>
@@ -70,46 +71,64 @@ function Navbar() {
             </div>
           </div>
 
-          {/* เพิ่ม Feature Buttons พร้อมระยะห่าง */}
-          <div className="flex space-x-6">
+          {/* Features */}
+          <div className="hidden sm:flex space-x-2 sm:space-x-6">
             <div
-              className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
+              className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
               onClick={() => navigate("/feature1")}
             >
               Feature1
             </div>
             <div
-              className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
+              className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
               onClick={() => navigate("/feature2")}
             >
               Feature2
             </div>
             <div
-              className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
+              className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
               onClick={() => navigate("/feature3")}
             >
               Feature3
             </div>
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button className="sm:hidden text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            ☰
+          </button>
         </div>
 
-        {isLoggedIn &&(
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="sm:hidden absolute top-16 left-0 w-full bg-gradient-to-r from-red-500 to-red-700 shadow-lg p-4">
+            <ul className="space-y-4">
+              <li className="text-white font-semibold text-lg" onClick={() => navigate("/feature1")}>
+                Feature1
+              </li>
+              <li className="text-white font-semibold text-lg" onClick={() => navigate("/feature2")}>
+                Feature2
+              </li>
+              <li className="text-white font-semibold text-lg" onClick={() => navigate("/feature3")}>
+                Feature3
+              </li>
+            </ul>
+          </div>
+        )}
+
+        {/* User Section */}
+        {isLoggedIn && (
           <div className="flex items-center space-x-4 ml-auto mr-3">
-          <button
-            type="button"
-            className="relative inline-flex items-center px-4 py-2 text-sm text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full hover:from-red-500 hover:to-red-800 focus:ring-4 focus:ring-red-300 shadow-lg transition duration-300 transform hover:scale-105"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
-              fill="currentColor"
+            <button
+              type="button"
+              className="inline-flex items-center px-4 py-2 text-sm text-white bg-gradient-to-r from-red-500 to-red-600 rounded-full hover:from-red-500 hover:to-red-800 focus:ring-4 focus:ring-red-300 shadow-lg"
             >
-              <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
-            </svg>
-            <span className="font-semibold">Username/Register</span>
-          </button>
-          <button
+              <svg className="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
+                <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+              </svg>
+              <span className="font-semibold">Username/Register</span>
+            </button>
+            <button
             type="button"
             className="relative inline-flex items-center px-1.5 py-1.5 text-sm text-white bg-[#c12222] rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
           >
@@ -126,25 +145,19 @@ function Navbar() {
               0
             </div>
           </button>
-        </div>
+          </div>
+          
         )}
 
-        {/* Right Section: Login */}
-        {isLoggedIn ? (
-          <div
-            className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-            onClick={handleLogout}
-          >
-            LOGOUT
-          </div>
-        ) : (
-          <div
-            className="text-white font-semibold text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-            onClick={() => navigate("/login")}
-          >
-            LOGIN
-          </div>
-        )}
+
+        
+        {/* Login/Logout Button */}
+        <div
+          className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
+          onClick={isLoggedIn ? handleLogout : () => navigate("/login")}
+        >
+          {isLoggedIn ? "LOGOUT" : "LOGIN"}
+        </div>
       </div>
     </div>
   );
