@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 
 function decodeToken(token) {
   try {
-    const base64Url = token.split('.')[1]; 
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); 
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
-    
-    return JSON.parse(jsonPayload); 
+
+    return JSON.parse(jsonPayload);
   } catch (error) {
     console.error("Invalid token", error);
     return null;
@@ -23,12 +24,43 @@ function Navbar() {
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
   const decodedToken = isLoggedIn ? decodeToken(token) : null;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState(null);
+  const [Category, setCategory] = useState([]);
+
+  useEffect(() => {
+    getCategory();
+  }, [])
+
+  // Dummy data
+  const dummyData = [...Array(15).keys()].map(i => ({
+    id: i,
+    title: `Dummy Item ${i + 1}`,
+    description: `This is the description for item ${i + 1}`
+  }));
+
+  // Handle feature selection
+  const handleFeatureClick = (feature) => {
+    setSelectedFeature(feature);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
-    navigate('/login');  
+    navigate('/login');
   };
+
+  const getCategory = async () => {
+    try {
+      const res = await api.get("/category/");
+      const data = res.data;
+      setCategory(data);
+      console.log(data)
+      // setLoading(false);
+    } catch (err) {
+      alert(err)
+      console.log(err);
+    }
+  }
 
   return (
     <div className="relative border-b-4 border-gray-300 bg-gradient-to-r from-red-500 to-red-700 p-4 shadow-lg relative">
@@ -49,7 +81,7 @@ function Navbar() {
             </div>
             <div className="absolute left-0 mt-2 w-screen bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-200 z-50">
               <ul className="grid grid-cols-4 gap-6 text-gray-700 px-24 py-4">
-                {[...Array(15).keys()].map((i) => (
+                {Category.map((i) => (
                   <li
                     key={i}
                     className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
@@ -57,12 +89,12 @@ function Navbar() {
                   >
                     <div className="flex flex-col items-center">
                       <img
-                        src="src/image/picForNav.jpg"
-                        alt={`Item ${i}`}
+                        src={i.image_url}
+                        alt={i.name}
                         className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
                       />
                       <span className="text-xs sm:text-sm font-medium text-gray-800">
-                        Item{i}
+                        {i.name}
                       </span>
                     </div>
                   </li>
@@ -101,20 +133,58 @@ function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="sm:hidden absolute top-16 left-0 w-full bg-gradient-to-r from-red-500 to-red-700 shadow-lg p-4">
-            <ul className="space-y-4">
-              <li className="text-white font-semibold text-lg" onClick={() => navigate("/feature1")}>
-                Feature1
-              </li>
-              <li className="text-white font-semibold text-lg" onClick={() => navigate("/feature2")}>
-                Feature2
-              </li>
-              <li className="text-white font-semibold text-lg" onClick={() => navigate("/feature3")}>
-                Feature3
-              </li>
-            </ul>
+          <div className="sm:hidden absolute top-16 left-0 w-full h-screen bg-gradient-to-r from-red-500 to-red-700 shadow-lg p-4">
+            <div className="grid grid-cols-3 gap-4 h-screen">
+
+              {/* Feature List Section */}
+              <div className="bg-orange-400 col-span-1 p-2">
+                <ul className="space-y-4">
+                  <li
+                    className="text-white font-semibold text-lg cursor-pointer"
+                    onClick={() => handleFeatureClick("SERIES")}
+                  >
+                    SERIES
+                  </li>
+                  <li
+                    className="text-white font-semibold text-lg cursor-pointer"
+                    onClick={() => handleFeatureClick("Feature1")}
+                  >
+                    Feature1
+                  </li>
+                  <li
+                    className="text-white font-semibold text-lg cursor-pointer"
+                    onClick={() => handleFeatureClick("Feature2")}
+                  >
+                    Feature2
+                  </li>
+                  <li
+                    className="text-white font-semibold text-lg cursor-pointer"
+                    onClick={() => handleFeatureClick("Feature3")}
+                  >
+                    Feature3
+                  </li>
+                </ul>
+              </div>
+
+              {/* Detail Section */}
+              <div className="bg-blue-400 col-span-2 p-4 flex flex-col items-center text-white font-semibold text-lg relative overflow-y-auto">
+                <h2 className="text-2xl mb-4">{selectedFeature || "Select a feature"}</h2>
+                {selectedFeature && (
+                  <ul className="space-y-2">
+                    {dummyData.map(item => (
+                      <li key={item.id} className="bg-white text-gray-800 p-2 rounded shadow">
+                        <h3 className="font-bold">{item.title}</h3>
+                        <p>{item.description}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
           </div>
         )}
+
+
 
         {/* User Section */}
         {isLoggedIn && (
@@ -129,28 +199,28 @@ function Navbar() {
               <span className="font-semibold">Username/Register</span>
             </button>
             <button
-            type="button"
-            className="relative inline-flex items-center px-1.5 py-1.5 text-sm text-white bg-[#c12222] rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
-          >
-            <svg
-              className="w-5 h-5 me-2"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 576 512"
-              fill="currentColor"
+              type="button"
+              className="relative inline-flex items-center px-1.5 py-1.5 text-sm text-white bg-[#c12222] rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
             >
-              <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
-            </svg>
+              <svg
+                className="w-5 h-5 me-2"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 576 512"
+                fill="currentColor"
+              >
+                <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
+              </svg>
 
-            <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2">
-              0
-            </div>
-          </button>
+              <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2">
+                0
+              </div>
+            </button>
           </div>
-          
+
         )}
 
 
-        
+
         {/* Login/Logout Button */}
         <div
           className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"

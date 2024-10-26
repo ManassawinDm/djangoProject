@@ -25,7 +25,7 @@ function PreHome() {
             const res = await api.get("/");
             const data = res.data;
             setProducts(data);
-            console.log(data)
+            // console.log(data)
             setLoading(false);
         } catch (err) {
             alert(err)
