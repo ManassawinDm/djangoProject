@@ -72,4 +72,24 @@ class NoteDelecte(generics.DestroyAPIView):
         user = self.request.user
         return Note.objects.filter(author=user)
 
-# Create your views here.
+class TypeListView(APIView):
+    permission_classes = [AllowAny]  # Allow access without authentication
+
+    def post(self, request, *args, **kwargs):
+        typeid = request.data.get('typeId')  # Get typeId from request data
+        print("Received typeId:", typeid)
+
+        if typeid:  # If typeId is provided, filter by it
+            try:
+                products = Product.objects.filter(category_id=typeid)  # Fetch products by category
+                serializer = ProductSerializer(products, many=True)
+                print("Data is:", serializer.data)
+                return Response(serializer.data)  # Return the specific products
+            except Exception as e:
+                print(f"Error fetching products: {e}")
+                return Response({"error": "An error occurred while fetching products."}, status=500)
+
+        # If no typeId is provided, return all products
+        products = Product.objects.all()
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)  # Return all products as JSON

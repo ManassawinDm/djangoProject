@@ -11,7 +11,7 @@ import Loading from './components/Loading'
 
 const ProductDetial = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));
-
+const Type = React.lazy(() => import('./pages/Type'));
 function Logout() {
   localStorage.clear()
   return <Navigate to="/login" />
@@ -48,6 +48,14 @@ function App() {
           element={
             <Suspense fallback={<Loading />}>
               <ProductDetial />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/series"
+          element={
+            <Suspense fallback={<Loading />}>
+              <Type />
             </Suspense>
           }
         />

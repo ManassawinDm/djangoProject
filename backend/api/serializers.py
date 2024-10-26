@@ -38,7 +38,7 @@ class NoteSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'description', 'image_url']
+        fields = ['id', 'name', 'description', 'image_url','type']
 
 # Serializer สำหรับสินค้า
 class ProductSerializer(serializers.ModelSerializer):

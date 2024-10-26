@@ -55,7 +55,7 @@ function PreHome() {
             <div className="w-full grid grid-cols-5">
                 <div className="grid col-start-2 col-end-5">
                     <h1 className="flex justify-start mt-10 mb-3 font-sans text-2xl text-[#e60021] font-bold"> สินค้าใหม่ </h1>
-                    <ul className="grid grid-cols-5 gap-6 ">
+                    <ul className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 ">
                         {visibleProducts.map((product, index) => (
                             <li key={product.id} ref={visibleProducts.length === index + 1 ? lastProductRef : null} className="text-left mb-16">
                                 <button onClick={() => handleImageClick(product.id)}>
