@@ -88,7 +88,8 @@ function Navbar() {
                   <li
                     key={i}
                     className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
-                    onClick={() => navigate(`/series${i}`)}
+                    onClick={() => navigate(`/series?typeid=${i.id}&typename=${i.name}`)}
+
                   >
                     <div className="flex flex-col items-center">
                       <img

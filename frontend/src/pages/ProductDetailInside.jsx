@@ -120,19 +120,6 @@ function ProductDetailInside() {
             <p className="text-xl text-red-500">{products.price}</p>
 
             <div className="mt-4">
-              <label htmlFor="size" className="block text-lg font-semibold">
-                ขนาด:
-              </label>
-              <select
-                id="size"
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-              >
-                <option>คลิกเลือกขนาด</option>
-                <option>ขนาด 8-12 เซนติเมตร</option>
-              </select>
-            </div>
-
-            <div className="mt-4">
               <label htmlFor="quantity" className="block text-lg font-semibold">
                 จำนวน:
               </label>
