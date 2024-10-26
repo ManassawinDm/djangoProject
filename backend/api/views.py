@@ -29,12 +29,25 @@ class ProductListCategory(APIView):
         return Response(serializer.data)  # ส่งข้อมูลสินค้าเป็น JSON
     
 class ProductListView(APIView):
-    permission_classes = [IsAuthenticated]  # บังคับให้ต้องล็อกอินก่อนถึงจะเข้าถึงข้อมูลได้
+    permission_classes = [AllowAny]  # Allow access without authentication
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        product_id = request.data.get('productId')  # Get productId from request data
+        print("Received productId:", product_id)
+
+        if product_id:  # If productId is provided, filter by it
+            try:
+                product = Product.objects.get(id=product_id)  # Fetch the specific product
+                serializer = ProductSerializer(product)
+                print("data is:",serializer)
+                return Response(serializer.data)  # Return the specific product
+            except Product.DoesNotExist:
+                return Response({"error": "Product not found"}, status=404)  # Handle product not found
+
+        # If no productId is provided, return all products
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)  # ส่งข้อมูลสินค้าเป็น JSON
+        return Response(serializer.data)  # Return all products as JSON
 
 
 class NoteListCreate(generics.ListCreateAPIView):
