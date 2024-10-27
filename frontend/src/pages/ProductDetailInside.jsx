@@ -3,7 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useLocation } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import Loading from "../components/Loading"
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
+function decodeToken(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Invalid token", error);
+    return null;
+  }
+}
 
 function ProductDetailInside() {
   const [quantity, setQuantity] = useState(1);
@@ -15,6 +32,8 @@ function ProductDetailInside() {
   const navigate = useNavigate();
   const token = localStorage.getItem(ACCESS_TOKEN);
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
+  const [loading,setLoading] = useState(true)
+  const decode = isLoggedIn ? decodeToken(token) : null;
   // const decodedToken = isLoggedIn ? decodeToken(token) : null;
 
 
@@ -23,6 +42,7 @@ function ProductDetailInside() {
       const res = await api.post("/product/", { productId }); // Wrap productId in an object
       const data = res.data; // Extract data from the response
       setProducts(data); // Set the state with the product data
+      setLoading(false)
     } catch (err) {
       alert("Error fetching product: " + err.message); // Display a user-friendly error message
       console.error(err); // Log the error for debugging
@@ -64,16 +84,18 @@ function ProductDetailInside() {
     setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 1));
   };
 
-  const AddToCart=()=>{
-    console.log("Add to cart")
+  const AddToCart=(productId,quantity)=>{
+    console.log("Add to cart",decode.user_id,productId,quantity)
   }
+  if (loading) return <Loading />;
   return (
     <div>
       <div className="bg-gray-100 p-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Section: Product Images */}
           <div className="flex flex-col">
-            <img
+            <LazyLoadImage
+            effect="blur"
               className="w-full h-auto rounded-lg shadow-md"
               src={products.image_url}
               alt="Product"
@@ -94,7 +116,8 @@ function ProductDetailInside() {
                     src,
                     index // แสดง 3 ภาพย่อ
                   ) => (
-                    <img
+                    <LazyLoadImage
+                      effect="blur"
                       key={index}
                       className="h-20 w-20 object-cover rounded-lg shadow-md cursor-pointer"
                       src={products.image_url}
@@ -153,7 +176,7 @@ function ProductDetailInside() {
             <button
               type="button"
               className="relative inline-flex justify-center font-semibold mt-6 w-full px-1.5 py-3 text-sm text-white bg-red-600 rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
-              onClick={isLoggedIn ? AddToCart : () => navigate("/login")}
+              onClick={isLoggedIn ? () => AddToCart(products.id,quantity) : () => navigate("/login")}
 
             >
               <svg

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import api from '../api';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
-import Loading from './Loading';
+import Loading from "./Loading";
 
 function Form({ route, method }) {
   const [username, setUsername] = useState('');
@@ -34,6 +34,7 @@ function Form({ route, method }) {
       setLoading(false);
     }
   };
+  if (loading) return <Loading />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-red-500 to-red-700">

@@ -2,6 +2,25 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Note, Category, Product, Order, OrderItem, Payment, ShoppingCart
 
+class UserinfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["email"]
+
+from rest_framework import serializers
+from .models import ShoppingCart
+
+class CartinfoSerializer(serializers.ModelSerializer):
+    item_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ShoppingCart
+        fields = ["item_count", "product", "quantity"]  
+
+    def get_item_count(self, obj):
+        return ShoppingCart.objects.filter(user=obj.user).count()
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     confirmpassword = serializers.CharField(write_only=True)
