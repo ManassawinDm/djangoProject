@@ -2,9 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import UserSerializer , NoteSerializer, CategorySerializer, OrderItemSerializer, PaymentSerializer, ProductSerializer, OrderSerializer, ShoppingCartSerializer
+from .serializers import UserSerializer , NoteSerializer, CategorySerializer, OrderItemSerializer, PaymentSerializer, ProductSerializer, OrderSerializer, ShoppingCartSerializer, UserinfoSerializer, CartinfoSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Note, ShoppingCart, Payment, Category, Order, OrderItem, Product ,Category
+from rest_framework import status
 
 class CreatUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -19,7 +20,50 @@ class ProductListPublic(APIView):
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)  # ส่งข้อมูลสินค้าเป็น JSON
-    
+
+
+
+class UserInformation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+
+        user_id = request.data.get('user_id')
+        
+        if not user_id:
+            return Response({'error': 'User ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(id=user_id)  
+            serializer = UserinfoSerializer(user)  
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CartInformation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get('user_id')
+        
+        if not user_id:
+            return Response({'error': 'User ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cart = ShoppingCart.objects.filter(user_id=user_id)  
+            serializer = CartinfoSerializer(cart, many=True)  
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+
+
+
+
 class ProductListCategory(APIView):
     permission_classes = [AllowAny]  
 
@@ -33,13 +77,11 @@ class ProductListView(APIView):
 
     def post(self, request, *args, **kwargs):
         product_id = request.data.get('productId')  # Get productId from request data
-        print("Received productId:", product_id)
 
         if product_id:  # If productId is provided, filter by it
             try:
                 product = Product.objects.get(id=product_id)  # Fetch the specific product
                 serializer = ProductSerializer(product)
-                print("data is:",serializer)
                 return Response(serializer.data)  # Return the specific product
             except Product.DoesNotExist:
                 return Response({"error": "Product not found"}, status=404)  # Handle product not found

@@ -22,14 +22,24 @@ function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem(ACCESS_TOKEN);
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
-  const decodedToken = isLoggedIn ? decodeToken(token) : null;
+  const decode = isLoggedIn ? decodeToken(token) : null;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState('SERIES');
+  const [userInfo, setUserInfo] = useState({});
+  const [cartInfo, setCartInfo] = useState({});
   const [Category, setCategory] = useState([]);
+  
 
   useEffect(() => {
     getCategory();
   }, [])
+
+  useEffect(()=>{
+    if (isLoggedIn) {  
+      GetDataUser();
+      FechCart();
+    }
+  },[isLoggedIn])
 
   // Dummy data
   const CategoryData = Category.map((value) => ({
@@ -39,11 +49,32 @@ function Navbar() {
     image_url: value.image_url
   }));
 
+  const GetDataUser = async () => {
+    try {
+      const res = await api.post("/userinfo/", { user_id: decode.user_id }); 
+      const data = res.data;
+      setUserInfo(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const FechCart = async () => {
+    try {
+      const res = await api.post("/cartinfo/", { user_id: decode.user_id }); 
+      const data = res.data;
+      console.log(data)
+      setCartInfo(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
+
 
   // Handle feature selection
   const handleFeatureClick = (feature) => {
     setSelectedFeature(feature);
-    console.log(feature)
   };
 
   const handleLogout = () => {
@@ -57,10 +88,8 @@ function Navbar() {
       const res = await api.get("/category/");
       const data = res.data;
       setCategory(data);
-      console.log(data)
       // setLoading(false);
     } catch (err) {
-      alert(err)
       console.log(err);
     }
   }
@@ -70,12 +99,21 @@ function Navbar() {
       <div className="flex justify-between items-center max-w-7xl mx-auto ">
         {/* Logo */}
         <div className="flex items-center space-x-4 sm:space-x-8 ">
-          <img
+          {isLoggedIn ? (
+            <img
+            className="h-12 w-auto cursor-pointer sm:h-20"
+            src="src/image/LOGO.webp"
+            alt="Logo"
+            onClick={() => navigate("/home")}
+          />
+          ) : (
+            <img
             className="h-12 w-auto cursor-pointer sm:h-20"
             src="src/image/LOGO.webp"
             alt="Logo"
             onClick={() => navigate("/")}
           />
+          )}
 
           {/* SERIES Dropdown */}
           <div className="hidden sm:block group ">
@@ -218,7 +256,7 @@ function Navbar() {
               <svg className="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
                 <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
               </svg>
-              <span className="font-semibold">Username/Register</span>
+              <span className="font-semibold">{userInfo && userInfo.email ? userInfo.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') : 'Username/Register'}</span>
             </button>
             <button
               type="button"
@@ -234,7 +272,7 @@ function Navbar() {
               </svg>
 
               <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2">
-                0
+              {Array.isArray(cartInfo) ? cartInfo.length : 0}
               </div>
             </button>
           </div>

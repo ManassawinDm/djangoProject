@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import api from '../api';
-import Loading from '../components/Loading';
+import Loading from '../components/PreHomeLoading';
 import { useNavigate } from 'react-router-dom';
 
 

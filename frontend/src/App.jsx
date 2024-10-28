@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Loading from './components/Loading'
+import PreHomeLoading from "./components/PreHomeLoading"
 
 const ProductDetial = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));
@@ -34,15 +35,15 @@ function App() {
         <Route
           path="/"
           element={
-            <Suspense fallback={<Loading />}>
+            <Suspense fallback={<PreHomeLoading />}>
               <PreHome />
             </Suspense>
           }
         />
-        <Route path="/loading" element={<Loading />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/loading" element={<PreHomeLoading />} />
         <Route
           path="/product"
           element={
