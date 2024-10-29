@@ -6,6 +6,20 @@ from .serializers import UserSerializer , NoteSerializer, CategorySerializer, Or
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Note, ShoppingCart, Payment, Category, Order, OrderItem, Product ,Category
 from rest_framework import status
+from decouple import config
+from Crypto.Cipher import AES
+import base64
+import urllib.parse
+
+SECRET_KEY = config('SECRET_KEY').ljust(32).encode('utf-8')
+def decode_query_param(encrypted_param):
+    encrypted_param = urllib.parse.unquote(encrypted_param)
+    
+    cipher = AES.new(SECRET_KEY, AES.MODE_ECB)
+    decrypted_bytes = cipher.decrypt(base64.b64decode(encrypted_param))
+    
+    return decrypted_bytes.decode('utf-8').strip()
+
 
 class CreatUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -60,6 +74,29 @@ class CartInformation(APIView):
             return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        
+
+class AddToCart(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get('user_id')
+        product_id = request.data.get('product_id')
+        quantity = request.data.get('quantity')
+
+        try:
+            print(user_id,product_id,quantity)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def get(self, request, *args, **kwargs):
+        encoded_user_id = request.GET.get('user_id')
+        user_id = decode_query_param(encoded_user_id)
+        
+        print("user_id:", user_id)
+        return Response({'user_id': user_id, 'message': 'Decoded user_id successfully.'})
 
 
 
@@ -119,7 +156,6 @@ class TypeListView(APIView):
 
     def post(self, request, *args, **kwargs):
         typeid = request.data.get('typeId')  # Get typeId from request data
-        print("Received typeId:", typeid)
 
         if typeid:  # If typeId is provided, filter by it
             try:

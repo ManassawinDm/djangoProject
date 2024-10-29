@@ -6,6 +6,8 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import Loading from "../components/Loading"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import CryptoJS from 'crypto-js';
+
 
 function decodeToken(token) {
   try {
@@ -28,7 +30,7 @@ function ProductDetailInside() {
   const [products, setProducts] = useState([]);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const productId = queryParams.get('productId'); // Retrieve the 'productId' query parameter
+  const productId = queryParams.get('productId'); 
   const navigate = useNavigate();
   const token = localStorage.getItem(ACCESS_TOKEN);
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
@@ -36,6 +38,19 @@ function ProductDetailInside() {
   const decode = isLoggedIn ? decodeToken(token) : null;
   // const decodedToken = isLoggedIn ? decodeToken(token) : null;
 
+  const SECRET_KEY = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_SECRET_KEY.padEnd(32, ' '));
+
+
+  const encryptParam = (param) => {
+    if (!param) {
+        throw new Error('Parameter is undefined or null');
+    }
+    const encrypted = CryptoJS.AES.encrypt(param, SECRET_KEY, {
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7,
+    }).toString();
+    return encodeURIComponent(encrypted);
+};
 
   const getProduct = async (productId) => { // Ensure productId is passed as an argument
     try {
@@ -83,10 +98,48 @@ function ProductDetailInside() {
   const decrement = () => {
     setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 1));
   };
+  const AddToCart = async () => {
+    try {
 
-  const AddToCart=(productId,quantity)=>{
-    console.log("Add to cart",decode.user_id,productId,quantity)
-  }
+        const userId = decode.user_id.toString();  // แปลงเป็น string
+        console.log('User ID:', userId);  // ตรวจสอบค่า user_id
+        const encodedUserId = encryptParam(userId);
+        console.log('Encoded User ID:', encodedUserId);
+    } catch (error) {
+        console.error('Error encrypting user ID:', error);
+    }
+};
+
+  // const AddToCart = async (productId, quantity) => {
+  //   try {
+  //     const encodedUserId = encryptParam(decode.user_id); 
+  //     console.log(encodedUserId)
+  
+  //     const res = await api.get('/cart/', {
+  //       params: { user_id: encodedUserId },
+  //     });
+  
+  //     const cartItems = Array.isArray(res.data) ? res.data : [];
+  //     const existingItem = cartItems.find(item => item.product.id === productId);
+  
+  //     if (existingItem) {
+  //       const newQuantity = existingItem.quantity + quantity;
+  
+  //       await api.put(`/api/cart/${existingItem.id}`, { quantity: newQuantity });
+  //       console.log(`Updated ${existingItem.product.name} quantity to ${newQuantity}`);
+  //     } else {
+  //       await api.post('/api/cart', {
+  //         user_id: decode.user_id,
+  //         product_id: productId,
+  //         quantity,
+  //       });
+  //       console.log(`Added ${quantity} of product ID ${productId} to cart`);
+  //     }
+  //   } catch (err) {
+  //     console.error('Error adding to cart:', err);
+  //   }
+  // };
+
   if (loading) return <Loading />;
   return (
     <div>

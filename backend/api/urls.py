@@ -10,6 +10,7 @@ urlpatterns = [
     path("type/",views.TypeListView.as_view(),name="category-List-Public"),
 
     path("cartinfo/", views.CartInformation.as_view(), name="cart-Info"),
+    path("cart/", views.AddToCart.as_view(), name="cart"),
 
     path("notes/",views.NoteListCreate.as_view(),name="note-List"),
     path("notes/delete/<int:pk>",views.NoteDelecte.as_view(),name="delete-note"),
