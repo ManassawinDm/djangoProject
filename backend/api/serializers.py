@@ -92,12 +92,60 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = ['id', 'order', 'payment_date', 'amount', 'payment_method']
 
-# Serializer สำหรับตะกร้าสินค้า
+
+
+#ตะกร้า
 class ShoppingCartSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)  # แสดงข้อมูลสินค้าในตะกร้า
-    user = serializers.StringRelatedField(read_only=True)  # แสดงข้อมูล user
-    
+    quantity = serializers.IntegerField(min_value=1) 
+    product = ProductSerializer(read_only=True) 
+    user = serializers.StringRelatedField(read_only=True)  
+
     class Meta:
         model = ShoppingCart
-        fields = ['id', 'user', 'product', 'quantity']
+        fields = ['user', 'product', 'quantity']
+
+    def validate(self, data):
+        print("data",data)
+        try:
+            Product.objects.get(id=data['product_id'])
+        except Product.DoesNotExist:
+            raise serializers.ValidationError({'product_id': 'Product not found.'})
+
+        try:
+            User.objects.get(id=data['user_id'])
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'user_id': 'User not found.'})
+
+        return data  
+
+    def create(self, validated_data):
+        product = Product.objects.get(id=validated_data['product_id'])
+        user = User.objects.get(id=validated_data['user_id'])
+        quantity = validated_data['quantity']
+
+        return ShoppingCart.objects.create(product=product, user=user, quantity=quantity)
+    
+
+class ShoppingCartSerializerPostAPI(serializers.ModelSerializer):
+    quantity = serializers.IntegerField(min_value=1) 
+    product_id = serializers.IntegerField(write_only=True)  
+    user_id = serializers.IntegerField(write_only=True)    
+    product = ProductSerializer(read_only=True)
+    user = serializers.StringRelatedField(read_only=True)  
+
+    class Meta:
+        model = ShoppingCart
+        fields = ['user', 'product', 'quantity', 'product_id', 'user_id']
+
+    def validate(self, data):
+        try:
+            Product.objects.get(id=data['product_id'])
+        except Product.DoesNotExist:
+            raise serializers.ValidationError({'product_id': 'Product not found.'})
+        try:
+            User.objects.get(id=data['user_id'])
+        except User.DoesNotExist:
+            raise serializers.ValidationError({'user_id': 'User not found.'})
+
+        return data 
         

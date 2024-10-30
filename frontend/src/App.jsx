@@ -9,6 +9,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Loading from './components/Loading'
 import PreHomeLoading from "./components/PreHomeLoading"
+import { LogoProvider } from './Context/CartContext'
 
 const ProductDetial = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));
@@ -21,49 +22,51 @@ function Logout() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-            <Home />
-            </ProtectedRoute> 
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <Suspense fallback={<PreHomeLoading />}>
-              <PreHome />
-            </Suspense>
-          }
-        />
-        <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/loading" element={<PreHomeLoading />} />
-        <Route
-          path="/product"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProductDetial />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/series"
-          element={
-            <Suspense fallback={<Loading />}>
-              <Type />
-            </Suspense>
-          }
-        />
-        <Route path="*" element={<Notfound />} />
-      </Routes>
-      <Footer />
-    </BrowserRouter>
+    <LogoProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <Suspense fallback={<PreHomeLoading />}>
+                <PreHome />
+              </Suspense>
+            }
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/loading" element={<PreHomeLoading />} />
+          <Route
+            path="/product"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProductDetial />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/series"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Type />
+              </Suspense>
+            }
+          />
+          <Route path="*" element={<Notfound />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
+      </LogoProvider>
   )
 }
 

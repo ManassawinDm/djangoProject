@@ -7,6 +7,7 @@ import Loading from "../components/Loading"
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import CryptoJS from 'crypto-js';
+import { useLogo } from '../Context/CartContext';
 
 
 function decodeToken(token) {
@@ -36,6 +37,7 @@ function ProductDetailInside() {
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
   const [loading,setLoading] = useState(true)
   const decode = isLoggedIn ? decodeToken(token) : null;
+  const { triggerLogoAnimation } = useLogo();
   // const decodedToken = isLoggedIn ? decodeToken(token) : null;
 
   const SECRET_KEY = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_SECRET_KEY.padEnd(32, ' '));
@@ -98,47 +100,39 @@ function ProductDetailInside() {
   const decrement = () => {
     setQuantity((prevQuantity) => Math.max(prevQuantity - 1, 1));
   };
-  const AddToCart = async () => {
+
+  const AddToCart = async (productId, quantity) => {
     try {
+      const userId = decode.user_id.toString();
+      const encodedUserId = encryptParam(userId);
+  
+      const res = await api.get('/cart/', {
+        params: { user_id: encodedUserId },
+      });
+  
+      const cartItems = res.data;
 
-        const userId = decode.user_id.toString();  // แปลงเป็น string
-        console.log('User ID:', userId);  // ตรวจสอบค่า user_id
-        const encodedUserId = encryptParam(userId);
-        console.log('Encoded User ID:', encodedUserId);
-    } catch (error) {
-        console.error('Error encrypting user ID:', error);
+    const existingItem = cartItems.cart_items.find(item => item.product.id === productId);
+  
+      if (existingItem) {
+        const newQuantity = existingItem.quantity + quantity;
+        await api.put('/cart/', {
+          quantity: newQuantity,
+          product_id: productId,
+          user_id: encodedUserId
+      });
+      } else {
+        await api.post('/cart/', {
+          user_id: encodedUserId,
+          product_id: productId,
+          quantity:quantity,
+        });
+      }
+      triggerLogoAnimation();
+    } catch (err) {
+      console.error('Error adding to cart:', err);
     }
-};
-
-  // const AddToCart = async (productId, quantity) => {
-  //   try {
-  //     const encodedUserId = encryptParam(decode.user_id); 
-  //     console.log(encodedUserId)
-  
-  //     const res = await api.get('/cart/', {
-  //       params: { user_id: encodedUserId },
-  //     });
-  
-  //     const cartItems = Array.isArray(res.data) ? res.data : [];
-  //     const existingItem = cartItems.find(item => item.product.id === productId);
-  
-  //     if (existingItem) {
-  //       const newQuantity = existingItem.quantity + quantity;
-  
-  //       await api.put(`/api/cart/${existingItem.id}`, { quantity: newQuantity });
-  //       console.log(`Updated ${existingItem.product.name} quantity to ${newQuantity}`);
-  //     } else {
-  //       await api.post('/api/cart', {
-  //         user_id: decode.user_id,
-  //         product_id: productId,
-  //         quantity,
-  //       });
-  //       console.log(`Added ${quantity} of product ID ${productId} to cart`);
-  //     }
-  //   } catch (err) {
-  //     console.error('Error adding to cart:', err);
-  //   }
-  // };
+  };
 
   if (loading) return <Loading />;
   return (

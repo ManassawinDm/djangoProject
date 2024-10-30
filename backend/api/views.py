@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import UserSerializer , NoteSerializer, CategorySerializer, OrderItemSerializer, PaymentSerializer, ProductSerializer, OrderSerializer, ShoppingCartSerializer, UserinfoSerializer, CartinfoSerializer
+from .serializers import UserSerializer , NoteSerializer, CategorySerializer, OrderItemSerializer, PaymentSerializer, ProductSerializer, OrderSerializer, ShoppingCartSerializer, UserinfoSerializer, CartinfoSerializer, ShoppingCartSerializerPostAPI
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Note, ShoppingCart, Payment, Category, Order, OrderItem, Product ,Category
 from rest_framework import status
@@ -80,23 +80,69 @@ class AddToCart(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        user_id = request.data.get('user_id')
-        product_id = request.data.get('product_id')
-        quantity = request.data.get('quantity')
+        encoded_user_id = request.data.get('user_id')
+        decoded_user_id = decode_query_param(encoded_user_id)
+        data = {
+        "user_id": decoded_user_id,
+        "product_id": request.data.get('product_id'),
+        "quantity": request.data.get('quantity')
+    }
+        serializer = ShoppingCartSerializerPostAPI(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {'message': 'Added to cart successfully.'},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            print(user_id,product_id,quantity)
-        except User.DoesNotExist:
-            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
     def get(self, request, *args, **kwargs):
         encoded_user_id = request.GET.get('user_id')
         user_id = decode_query_param(encoded_user_id)
-        
-        print("user_id:", user_id)
-        return Response({'user_id': user_id, 'message': 'Decoded user_id successfully.'})
+
+        cart_items = ShoppingCart.objects.filter(user_id=user_id)
+
+        if not cart_items.exists():
+            return Response(
+                {'message': 'No items found in the cart for this user.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = ShoppingCartSerializer(cart_items, many=True)
+        return Response(
+            {'cart_items': serializer.data},
+            status=status.HTTP_200_OK
+        )
+    
+    def put(self, request, *args, **kwargs):
+        encoded_user_id = request.data.get('user_id')
+        user_id = decode_query_param(encoded_user_id)
+
+        product_id = request.data.get('product_id')
+        new_quantity = request.data.get('quantity')
+
+
+        if not product_id or new_quantity is None:
+            return Response(
+                {'message': 'Product ID and quantity are required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            cart_item = ShoppingCart.objects.get(user_id=user_id, product_id=product_id)
+        except ShoppingCart.DoesNotExist:
+            return Response(
+                {'message': 'Cart item not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        cart_item.quantity = new_quantity
+        cart_item.save()
+
+        serializer = ShoppingCartSerializer(cart_item)
+        return Response(
+            {'message': 'Quantity updated successfully.', 'data': serializer.data},
+            status=status.HTTP_200_OK
+        )
 
 
 
