@@ -41,7 +41,7 @@ function Navbar() {
       GetDataUser();
       FechCart();
     }
-  },[isLoggedIn])
+  },[isLoggedIn, logoAnimation])
 
   // Dummy data
   const CategoryData = Category.map((value) => ({
