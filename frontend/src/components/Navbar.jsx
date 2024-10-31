@@ -26,24 +26,23 @@ function Navbar() {
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
   const decode = isLoggedIn ? decodeToken(token) : null;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState('SERIES');
+  const [selectedFeature, setSelectedFeature] = useState(1);
   const [userInfo, setUserInfo] = useState({});
   const [cartInfo, setCartInfo] = useState({});
   const [Category, setCategory] = useState([]);
-  
+
 
   useEffect(() => {
     getCategory();
   }, [])
 
-  useEffect(()=>{
-    if (isLoggedIn) {  
+  useEffect(() => {
+    if (isLoggedIn) {
       GetDataUser();
       FechCart();
     }
-  },[isLoggedIn, logoAnimation])
+  }, [isLoggedIn, logoAnimation])
 
-  // Dummy data
   const CategoryData = Category.map((value) => ({
     id: value.id,
     name: value.name,
@@ -53,7 +52,7 @@ function Navbar() {
 
   const GetDataUser = async () => {
     try {
-      const res = await api.post("/userinfo/", { user_id: decode.user_id }); 
+      const res = await api.post("/userinfo/", { user_id: decode.user_id });
       const data = res.data;
       setUserInfo(data);
     } catch (err) {
@@ -63,7 +62,7 @@ function Navbar() {
 
   const FechCart = async () => {
     try {
-      const res = await api.post("/cartinfo/", { user_id: decode.user_id }); 
+      const res = await api.post("/cartinfo/", { user_id: decode.user_id });
       const data = res.data;
       console.log(data)
       setCartInfo(data);
@@ -71,7 +70,7 @@ function Navbar() {
       console.error(err);
     }
   };
-  
+
 
 
   // Handle feature selection
@@ -103,18 +102,18 @@ function Navbar() {
         <div className="flex items-center space-x-4 sm:space-x-8 ">
           {isLoggedIn ? (
             <img
-            className="h-12 w-auto cursor-pointer sm:h-20"
-            src="src/image/LOGO.webp"
-            alt="Logo"
-            onClick={() => navigate("/home")}
-          />
+              className="h-12 w-auto cursor-pointer sm:h-20"
+              src="src/image/LOGO.webp"
+              alt="Logo"
+              onClick={() => navigate("/home")}
+            />
           ) : (
             <img
-            className="h-12 w-auto cursor-pointer sm:h-20"
-            src="src/image/LOGO.webp"
-            alt="Logo"
-            onClick={() => navigate("/")}
-          />
+              className="h-12 w-auto cursor-pointer sm:h-20"
+              src="src/image/LOGO.webp"
+              alt="Logo"
+              onClick={() => navigate("/")}
+            />
           )}
 
           {/* SERIES Dropdown */}
@@ -124,48 +123,123 @@ function Navbar() {
             </div>
             <div className="absolute left-0 mt-2 w-screen bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-200 z-50">
               <ul className="grid grid-cols-4 gap-6 text-gray-700 px-24 py-4">
-                {Category.map((i) => (
-                  <li
-                    key={i}
-                    className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
-                    onClick={() => navigate(`/series?typeid=${i.id}&typename=${i.name}`)}
+                {Category.map((i) =>
+                  i.type == 1 ? (
+                    <li
+                      key={i}
+                      className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
+                      onClick={() => navigate(`/series?typeid=${i.id}`)}
 
-                  >
-                    <div className="flex flex-col items-center">
-                      <img
-                        src={i.image_url}
-                        alt={i.name}
-                        className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
-                      />
-                      <span className="text-xs sm:text-sm font-medium text-gray-800">
-                        {i.name}
-                      </span>
-                    </div>
-                  </li>
-                ))}
+                    >
+                      <div className="flex flex-col items-center">
+
+                        <img
+                          src={i.image_url}
+                          alt={i.name}
+                          className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
+                        />
+                        <span className="text-xs sm:text-sm font-medium text-gray-800">
+                          {i.name}
+                        </span>
+                      </div>
+                    </li>
+                  ) : null
+                )}
               </ul>
             </div>
           </div>
 
-          {/* Features */}
-          <div className="hidden sm:flex space-x-2 sm:space-x-6">
-            <div
-              className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-              onClick={() => navigate("/MEGA")}
-            >
+          <div className="hidden sm:block group ">
+            <div className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110">
               MEGA
             </div>
-            <div
-              className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-              onClick={() => navigate("/TYPE")}
-            >
+            <div className="absolute left-0 mt-2 w-screen bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-200 z-50">
+              <ul className="grid grid-cols-4 gap-6 text-gray-700 px-24 py-4">
+                {Category.map((i) =>
+                  i.type == 2 ? (
+                    <li
+                      key={i}
+                      className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
+                      onClick={() => navigate(`/series?typeid=${i.id}`)}
+
+                    >
+                      <div className="flex flex-col items-center">
+
+                        <img
+                          src={i.image_url}
+                          alt={i.name}
+                          className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
+                        />
+                        <span className="text-xs sm:text-sm font-medium text-gray-800">
+                          {i.name}
+                        </span>
+                      </div>
+                    </li>
+                  ) : null
+                )}
+              </ul>
+            </div>
+          </div>
+          <div className="hidden sm:block group ">
+            <div className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110">
               TYPE
             </div>
-            <div
-              className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110"
-              onClick={() => navigate("/ACCESSORIES")}
-            >
-              ACCESSORIES
+            <div className="absolute left-0 mt-2 w-screen bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-200 z-50">
+              <ul className="grid grid-cols-4 gap-6 text-gray-700 px-24 py-4">
+                {Category.map((i) =>
+                  i.type == 3 ? (
+                    <li
+                      key={i}
+                      className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
+                      onClick={() => navigate(`/series?typeid=${i.id}`)}
+
+                    >
+                      <div className="flex flex-col items-center">
+
+                        <img
+                          src={i.image_url}
+                          alt={i.name}
+                          className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
+                        />
+                        <span className="text-xs sm:text-sm font-medium text-gray-800">
+                          {i.name}
+                        </span>
+                      </div>
+                    </li>
+                  ) : null
+                )}
+              </ul>
+            </div>
+          </div>
+          <div className="hidden sm:block group ">
+            <div className="text-white font-semibold text-sm sm:text-lg cursor-pointer duration-150 hover:text-slate-300 hover:scale-110">
+              ACCESSORY
+            </div>
+            <div className="absolute left-0 mt-2 w-screen bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible duration-200 z-50">
+              <ul className="grid grid-cols-4 gap-6 text-gray-700 px-24 py-4">
+                {Category.map((i) =>
+                  i.type == 4 ? (
+                    <li
+                      key={i}
+                      className="hover:bg-gray-100 cursor-pointer text-center p-2 sm:p-4 rounded-lg transition duration-150 ease-in-out"
+                      onClick={() => navigate(`/series?typeid=${i.id}&typename=${i.name}`)}
+
+                    >
+                      <div className="flex flex-col items-center">
+
+                        <img
+                          src={i.image_url}
+                          alt={i.name}
+                          className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
+                        />
+                        <span className="text-xs sm:text-sm font-medium text-gray-800">
+                          {i.name}
+                        </span>
+                      </div>
+                    </li>
+                  ) : null
+                )}
+              </ul>
             </div>
           </div>
 
@@ -177,38 +251,38 @@ function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="border-t-2 border-red-600 sm:hidden absolute top-16 left-0 w-full h-screen bg-gradient-to-r from-red-500 to-red-700 shadow-lg">
+          <div className="border-t-2 border-red-600 sm:hidden absolute top-16 left-0 w-full h-screen bg-gradient-to-r from-red-500 to-red-700 shadow-lg z-50">
             <div className="grid grid-cols-3  h-screen">
 
               {/* Feature List Section */}
               <div className="bg-slate-200 col-span-1  text-black">
                 <ul className="">
                   <li
-                    className={`py-4 pl-2  font-bold text-lg cursor-pointer ${selectedFeature === "SERIES" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                    className={`py-4 pl-2  font-bold text-lg cursor-pointer ${selectedFeature === 1 ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
                       }`}
-                    onClick={() => handleFeatureClick("SERIES")}
+                    onClick={() => handleFeatureClick(1)}
                   >
                     SERIES
                   </li>
 
                   <li
-                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === "MEGA" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
-                    }`}
-                    onClick={() => handleFeatureClick("MEGA")}
+                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === 2 ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                      }`}
+                    onClick={() => handleFeatureClick(2)}
                   >
                     MEGA
                   </li>
                   <li
-                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === "TYPES" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
-                    }`}
-                    onClick={() => handleFeatureClick("TYPES")}
+                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === 3 ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                      }`}
+                    onClick={() => handleFeatureClick(3)}
                   >
                     TYPES
                   </li>
                   <li
-                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === "ACCESSORIES" ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
-                    }`}
-                    onClick={() => handleFeatureClick("ACCESSORIES")}
+                    className={`py-4 pl-2 font-bold text-lg cursor-pointer ${selectedFeature === 4 ? "bg-gradient-to-r from-red-500 to-red-600 text-white" : ""
+                      }`}
+                    onClick={() => handleFeatureClick(4)}
                   >
                     ACCESSORIES
                   </li>
@@ -220,7 +294,28 @@ function Navbar() {
 
                 {selectedFeature && (
                   <ul className="">
-                    {selectedFeature === "SERIES"
+                    {
+                      Category.map((item) => 
+                        item.type==selectedFeature ?(
+                        
+                        <li
+                          key={item.id}
+                          className=" text-gray-800 p-4 flex items-center space-x-4"
+                        >
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="h-16 w-16 object-cover rounded-full shadow-lg"
+                          />
+                          <div className="flex-1">
+                            <h3 className="font-bold text-lg">{item.name}</h3>
+                          </div>
+                        </li>
+
+                      ):null
+                    )
+                    }
+                    {/* {selectedFeature === 1
                       ? CategoryData.map((item) => (
                         <li
                           key={item.id}
@@ -236,12 +331,13 @@ function Navbar() {
                           </div>
                         </li>
                       ))
-                      : null}
+                      : null} */}
                   </ul>
                 )}
 
 
               </div>
+
             </div>
           </div>
         )}
@@ -266,26 +362,28 @@ function Navbar() {
             >
               {logoAnimation ? (
                 <svg
-                  className="w-10 h-10 me-2"
+                  className="w-10 h-10 me-2 "
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 576 512"
                   fill="currentColor"
+                  onClick={() => navigate("/cartlist")}
                 >
                   <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
                 </svg>
               ) : (
                 <svg
-                  className="w-5 h-5 me-2" 
+                  className="w-5 h-5 me-2 "
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 576 512"
                   fill="currentColor"
+                  onClick={() => navigate("/cartlist")}
                 >
                   <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
                 </svg>
               )}
 
               <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2">
-              {Array.isArray(cartInfo) ? cartInfo.length : 0}
+                {Array.isArray(cartInfo) ? cartInfo.length : 0}
               </div>
             </button>
           </div>
