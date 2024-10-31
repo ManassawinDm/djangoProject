@@ -32,6 +32,7 @@ function Navbar() {
   const [Category, setCategory] = useState([]);
 
 
+
   useEffect(() => {
     getCategory();
   }, [])
@@ -42,6 +43,11 @@ function Navbar() {
       FechCart();
     }
   }, [isLoggedIn, logoAnimation])
+
+  const handleNavigate = (url) => {
+    setIsMobileMenuOpen(false); // Hide dropdown when navigating
+    navigate(url); // Navigate to the new page
+  };
 
   const CategoryData = Category.map((value) => ({
     id: value.id,
@@ -64,7 +70,7 @@ function Navbar() {
     try {
       const res = await api.post("/cartinfo/", { user_id: decode.user_id });
       const data = res.data;
-      console.log(data)
+      // console.log(data)
       setCartInfo(data);
     } catch (err) {
       console.error(err);
@@ -251,7 +257,7 @@ function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="border-t-2 border-red-600 sm:hidden absolute top-16 left-0 w-full h-screen bg-gradient-to-r from-red-500 to-red-700 shadow-lg z-50">
+          <div className='border-t-2 border-red-600 sm:hidden absolute top-16 left-0 w-full h-screen bg-gradient-to-r from-red-500 to-red-700 shadow-lg z-50'>
             <div className="grid grid-cols-3  h-screen">
 
               {/* Feature List Section */}
@@ -301,6 +307,7 @@ function Navbar() {
                         <li
                           key={item.id}
                           className=" text-gray-800 p-4 flex items-center space-x-4"
+                          onClick={() => handleNavigate(`/series?typeid=${item.id}`)}
                         >
                           <img
                             src={item.image_url}
@@ -315,23 +322,6 @@ function Navbar() {
                       ):null
                     )
                     }
-                    {/* {selectedFeature === 1
-                      ? CategoryData.map((item) => (
-                        <li
-                          key={item.id}
-                          className=" text-gray-800 p-4 flex items-center space-x-4"
-                        >
-                          <img
-                            src={item.image_url}
-                            alt={item.name}
-                            className="h-16 w-16 object-cover rounded-full shadow-lg"
-                          />
-                          <div className="flex-1">
-                            <h3 className="font-bold text-lg">{item.name}</h3>
-                          </div>
-                        </li>
-                      ))
-                      : null} */}
                   </ul>
                 )}
 
