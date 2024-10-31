@@ -38,6 +38,7 @@ function ProductDetailInside() {
   const [loading,setLoading] = useState(true)
   const decode = isLoggedIn ? decodeToken(token) : null;
   const { triggerLogoAnimation } = useLogo();
+  const [animationClass, setAnimationClass] = useState('');
   // const decodedToken = isLoggedIn ? decodeToken(token) : null;
 
   const SECRET_KEY = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_SECRET_KEY.padEnd(32, ' '));
@@ -132,9 +133,11 @@ function ProductDetailInside() {
         });
       }
       triggerLogoAnimation();
+
     } catch (err) {
       console.error('Error adding to cart:', err);
     }
+
   };
 
   if (loading) return <Loading />;
@@ -144,9 +147,10 @@ function ProductDetailInside() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Section: Product Images */}
           <div className="flex flex-col">
+          <img src='/src/image/45.jpg' className='z-0 absolute w-1/3 mx-auto rounded-lg transition-all duration-700 '  />
             <LazyLoadImage
             effect="blur"
-              className="w-full h-auto rounded-lg shadow-md"
+              className="w-full h-auto rounded-lg shadow-md z-10"
               src={products.image_url}
               alt="Product"
             />
@@ -161,6 +165,7 @@ function ProductDetailInside() {
 
               {/* Show Img */}
               <div className="flex space-x-2 overflow-hidden">
+                
                 {thumbnails.slice(currentIndex, currentIndex + 3).map(
                   (
                     src,
@@ -209,7 +214,6 @@ function ProductDetailInside() {
                   type="number"
                   id="quantity"
                   value={quantity}
-                 
                   onChange={(e) => setQuantity(e.target.value)} // Assuming you have a setQuantity function to handle changes
                   className="block w-16 text-center p-2 border border-gray-300 rounded-md"
                 />
