@@ -12,13 +12,19 @@ import base64
 import urllib.parse
 
 SECRET_KEY = config('SECRET_KEY').ljust(32).encode('utf-8')
-def decode_query_param(encrypted_param):
+def decode_query_param(encrypted_param): 
+    # Decode the URL-encoded parameter
     encrypted_param = urllib.parse.unquote(encrypted_param)
     
+    # Decrypt the parameter
     cipher = AES.new(SECRET_KEY, AES.MODE_ECB)
     decrypted_bytes = cipher.decrypt(base64.b64decode(encrypted_param))
     
-    return decrypted_bytes.decode('utf-8').strip()
+    # Remove padding
+    padding_length = decrypted_bytes[-1]
+    decrypted_text = decrypted_bytes[:-padding_length].decode('utf-8')
+    
+    return decrypted_text
 
 
 class CreatUserView(generics.CreateAPIView):
@@ -82,11 +88,12 @@ class AddToCart(APIView):
     def post(self, request, *args, **kwargs):
         encoded_user_id = request.data.get('user_id')
         decoded_user_id = decode_query_param(encoded_user_id)
+        print("decoded_user_id",decoded_user_id)
         data = {
-        "user_id": decoded_user_id,
-        "product_id": request.data.get('product_id'),
-        "quantity": request.data.get('quantity')
-    }
+            "user_id": decoded_user_id,
+            "product_id": request.data.get('product_id'),
+            "quantity": request.data.get('quantity')
+        }
         serializer = ShoppingCartSerializerPostAPI(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -102,18 +109,18 @@ class AddToCart(APIView):
 
         cart_items = ShoppingCart.objects.filter(user_id=user_id)
 
-        if not cart_items.exists():
-            return Response(
-                {'message': 'No items found in the cart for this user.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # if not cart_items.exists():
+        #     return Response(
+        #         {'message': 'No items found in the cart for this user.'},
+        #         status=status.HTTP_404_NOT_FOUND
+        #     )
 
         serializer = ShoppingCartSerializer(cart_items, many=True)
         return Response(
             {'cart_items': serializer.data},
             status=status.HTTP_200_OK
         )
-    
+
     def put(self, request, *args, **kwargs):
         encoded_user_id = request.data.get('user_id')
         user_id = decode_query_param(encoded_user_id)
@@ -121,17 +128,17 @@ class AddToCart(APIView):
         product_id = request.data.get('product_id')
         new_quantity = request.data.get('quantity')
 
-
         if not product_id or new_quantity is None:
             return Response(
                 {'message': 'Product ID and quantity are required.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
         try:
             cart_item = ShoppingCart.objects.get(user_id=user_id, product_id=product_id)
         except ShoppingCart.DoesNotExist:
             return Response(
-                {'message': 'Cart item not found.'},
+                {'message': 'Cart item not found for the provided user and product.'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -207,7 +214,6 @@ class TypeListView(APIView):
             try:
                 products = Product.objects.filter(category_id=typeid)  # Fetch products by category
                 serializer = ProductSerializer(products, many=True)
-                print("Data is:", serializer.data)
                 return Response(serializer.data)  # Return the specific products
             except Exception as e:
                 print(f"Error fetching products: {e}")

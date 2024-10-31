@@ -15,6 +15,7 @@ import AdminFooter from './components/AdminFooter'
 import ManageProduct from './pages/AdminPage/ManageProduct'
 import EditProduct from './pages/AdminPage/EditProduct'
 import AddProduct from './pages/AdminPage/AddProduct'
+import { LogoProvider } from './Context/CartContext'
 
 const ProductDetail = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));
@@ -27,12 +28,13 @@ function Logout() {
 
 // ฟังก์ชันตรวจสอบสถานะ Admin
 function isAdmin() {
-  return true
-  // return localStorage.getItem('isAdmin') === 'true'; // หรือเงื่อนไขที่เหมาะสม
+  // return true
+  return localStorage.getItem('isAdmin') === 'true'; // หรือเงื่อนไขที่เหมาะสม
 }
 
 function App() {
   return (
+    <LogoProvider>
     <BrowserRouter>
       {/* เลือก Navbar ตามสิทธิ์ */}
       {isAdmin() ? <AdminNavbar /> : <Navbar />}
@@ -96,6 +98,7 @@ function App() {
       {/* เลือก Footer ตามสิทธิ์ */}
       {isAdmin() ? <AdminFooter /> : <Footer />}
     </BrowserRouter>
+    </LogoProvider>
   )
 }
 

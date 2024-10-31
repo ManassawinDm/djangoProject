@@ -102,6 +102,7 @@ function ProductDetailInside() {
   };
 
   const AddToCart = async (productId, quantity) => {
+
     try {
       const userId = decode.user_id.toString();
       const encodedUserId = encryptParam(userId);
@@ -109,10 +110,12 @@ function ProductDetailInside() {
       const res = await api.get('/cart/', {
         params: { user_id: encodedUserId },
       });
-  
+   
       const cartItems = res.data;
+      
 
     const existingItem = cartItems.cart_items.find(item => item.product.id === productId);
+    
   
       if (existingItem) {
         const newQuantity = existingItem.quantity + quantity;
