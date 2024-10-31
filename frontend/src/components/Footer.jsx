@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <div className="bg-gradient-to-r from-red-500 to-red-700 text-white py-4 mt-1">
+    <div className="bg-gradient-to-r from-red-500 to-red-700 text-white py-4 ">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
         <div className="text-sm">
           &copy; {new Date().getFullYear()} CS Art Toy. All Rights Reserved.
