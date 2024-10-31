@@ -52,35 +52,42 @@ function PreHome() {
     }
     if (loading) return <Loading />;
     return (
-        <div className="w-full grid grid-cols-5">
-            <div className="grid col-start-2 col-end-5">
+        <div className="w-full grid grid-cols-7">
+            <div className="grid col-start-2 col-end-7">
                 <h1 className="flex justify-start mt-10 mb-3 font-sans text-2xl text-[#e60021] font-bold"> สินค้าใหม่ </h1>
-                <ul className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 ">
+                <ul className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                     {visibleProducts.map((product, index) => (
-                        <li key={product.id} ref={visibleProducts.length === index + 1 ? lastProductRef : null} className="text-left mb-16">
-                            <button onClick={() => handleImageClick(product.id)}>
+                        <li key={product.id} ref={visibleProducts.length === index + 1 ? lastProductRef : null} className="bg-white border border-gray-200 rounded-lg shadow-lg transition-shadow hover:shadow-xl overflow-hidden">
+                            <button onClick={() => handleImageClick(product.id)} className="w-full bg-slate-100">
                                 <LazyLoadImage
                                     effect="blur"
                                     src={product.image_url}
                                     alt={product.name}
-                                    className="w-full h-auto object-cover mb-4 rounded-md"
+                                    className="w-full h-48 object-cover"
                                 />
                             </button>
-                            <strong className="block text-[#9f6f00] text-lg font-semibold">POP MART</strong>
-                            <p className="font-semibold text-lg mb-5">
-                                {product.name.length > 20 ? `${product.name.slice(0, 20)}...` : product.name}
-                            </p>
-                            <p className="text-[#d2001e] font-bold">฿{product.price}</p>
-                            <div className='flex mt-5 justify-center'>
-                                <button class="relative inline-flex items-center justify-start px-6 py-2 overflow-hidden font-medium transition-all bg-red-500 rounded-xl group">
-                                    <span class="absolute top-0 right-0 inline-block w-3 h-4 transition-all duration-500 ease-in-out bg-red-700 rounded group-hover:-mr-4 group-hover:-mt-4">
-                                        <span class="absolute top-0 right-0 w-5 h-5 rotate-45 translate-x-1/2 -translate-y-1/2 bg-white"></span>
-                                    </span>
-                                    <span class="absolute bottom-0 left-0 w-full h-full transition-all duration-500 ease-in-out delay-200 -translate-x-full translate-y-full bg-red-600 rounded-2xl group-hover:mb-12 group-hover:translate-x-0"></span>
-                                    <span class="relative w-full text-left text-white transition-colors duration-200 ease-in-out group-hover:text-white">
-                                        ชื้อสินค้า
-                                    </span>
-                                </button>
+                            <div className="p-5">
+                                <p className="font-semibold text-lg mb-2 min-h-[3rem] line-clamp-2">
+                                    {product.name}
+                                </p>
+
+                                <p className="text-[#d2001e] font-bold mb-4">฿{product.price}</p>
+                                <div className="flex  justify-center">
+                                    <button className="relative inline-flex items-center px-4 py-2 overflow-hidden font-medium bg-red-500 text-white rounded-lg transition duration-300 ease-in-out group hover:bg-red-600">
+                                        <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-in-out -translate-x-full translate-y-full bg-red-600 rounded-xl group-hover:translate-x-0 group-hover:translate-y-0"></span>
+                                        <svg
+                                            className="w-5 h-5 me-2 z-10"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 576 512"
+                                            fill="#ffffff"
+                                        >
+                                            <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
+                                        </svg>
+                                        <span className="relative z-10">
+                                            ชื้อสินค้า
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
                         </li>
                     ))}
