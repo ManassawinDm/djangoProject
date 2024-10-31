@@ -2,7 +2,11 @@
 module.exports = {
   content: [],
   theme: {
-    extend: {},
+    fontFamily: {
+      din: ['"DIN Alternate"', 'sans-serif'], 
+      sans: ['"TH Sarabun New"', 'sans-serif'],  
+    },
+     
   },
   plugins: [],
 }

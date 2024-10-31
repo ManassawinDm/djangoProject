@@ -52,10 +52,10 @@ function PreHome() {
     }
     if (loading) return <Loading />;
     return (
-        <div className="w-full grid grid-cols-7">
-            <div className="grid col-start-2 col-end-7">
-                <h1 className="flex justify-start mt-10 mb-3 font-sans text-2xl text-[#e60021] font-bold"> สินค้าใหม่ </h1>
-                <ul className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="w-full grid grid-cols-12 lg:grid-cols-7">
+            <div className="grid col-start-2 col-end-12 lg:col-start-2 lg:col-end-7">
+                <h1 className="flex justify-start lg:mt-10 mb-3  text-2xl text-[#e60021] font-bold font-sarabun"> สินค้าใหม่ </h1>
+                <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 lg:gap-6">
                     {visibleProducts.map((product, index) => (
                         <li key={product.id} ref={visibleProducts.length === index + 1 ? lastProductRef : null} className="bg-white border border-gray-200 rounded-lg shadow-lg transition-shadow hover:shadow-xl overflow-hidden">
                             <button onClick={() => handleImageClick(product.id)} className="w-full bg-slate-100">
@@ -71,8 +71,10 @@ function PreHome() {
                                     {product.name}
                                 </p>
 
-                                <p className="text-[#d2001e] font-bold mb-4">฿{product.price}</p>
-                                <div className="flex  justify-center">
+                                <p className="text-[#d2001e] font-bold mb-4">฿{Number(product.price).toLocaleString()}</p>
+
+
+                                <div className="flex  justify-center hidden lg:block">
                                     <button className="relative inline-flex items-center px-4 py-2 overflow-hidden font-medium bg-red-500 text-white rounded-lg transition duration-300 ease-in-out group hover:bg-red-600">
                                         <span className="absolute inset-0 w-full h-full transition-all duration-300 ease-in-out -translate-x-full translate-y-full bg-red-600 rounded-xl group-hover:translate-x-0 group-hover:translate-y-0"></span>
                                         <svg

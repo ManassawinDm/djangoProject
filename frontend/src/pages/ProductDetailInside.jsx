@@ -31,11 +31,11 @@ function ProductDetailInside() {
   const [products, setProducts] = useState([]);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const productId = queryParams.get('productId'); 
+  const productId = queryParams.get('productId');
   const navigate = useNavigate();
   const token = localStorage.getItem(ACCESS_TOKEN);
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
-  const [loading,setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const decode = isLoggedIn ? decodeToken(token) : null;
   const { triggerLogoAnimation } = useLogo();
   const [animationClass, setAnimationClass] = useState('');
@@ -46,14 +46,14 @@ function ProductDetailInside() {
 
   const encryptParam = (param) => {
     if (!param) {
-        throw new Error('Parameter is undefined or null');
+      throw new Error('Parameter is undefined or null');
     }
     const encrypted = CryptoJS.AES.encrypt(param, SECRET_KEY, {
-        mode: CryptoJS.mode.ECB,
-        padding: CryptoJS.pad.Pkcs7,
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
     }).toString();
     return encodeURIComponent(encrypted);
-};
+  };
 
   const getProduct = async (productId) => { // Ensure productId is passed as an argument
     try {
@@ -88,14 +88,14 @@ function ProductDetailInside() {
   };
 
   const increment = () => {
-    setQuantity((prevQuantity) =>{
+    setQuantity((prevQuantity) => {
       if (prevQuantity < products.stock) {
         return prevQuantity + 1; // Increment the quantity
       }
       return prevQuantity
     }
     )
-    ; // List Qty
+      ; // List Qty
   };
 
   const decrement = () => {
@@ -107,29 +107,29 @@ function ProductDetailInside() {
     try {
       const userId = decode.user_id.toString();
       const encodedUserId = encryptParam(userId);
-  
+
       const res = await api.get('/cart/', {
         params: { user_id: encodedUserId },
       });
-   
-      const cartItems = res.data;
-      
 
-    const existingItem = cartItems.cart_items.find(item => item.product.id === productId);
-    
-  
+      const cartItems = res.data;
+
+
+      const existingItem = cartItems.cart_items.find(item => item.product.id === productId);
+
+
       if (existingItem) {
         const newQuantity = existingItem.quantity + quantity;
         await api.put('/cart/', {
           quantity: newQuantity,
           product_id: productId,
           user_id: encodedUserId
-      });
+        });
       } else {
         await api.post('/cart/', {
           user_id: encodedUserId,
           product_id: productId,
-          quantity:quantity,
+          quantity: quantity,
         });
       }
       triggerLogoAnimation();
@@ -147,9 +147,8 @@ function ProductDetailInside() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Section: Product Images */}
           <div className="flex flex-col">
-          <img src='/src/image/45.jpg' className='z-0 absolute w-1/3 mx-auto rounded-lg transition-all duration-700 '  />
             <LazyLoadImage
-            effect="blur"
+              effect="blur"
               className="w-full h-auto rounded-lg shadow-md z-10"
               src={products.image_url}
               alt="Product"
@@ -165,7 +164,7 @@ function ProductDetailInside() {
 
               {/* Show Img */}
               <div className="flex space-x-2 overflow-hidden">
-                
+
                 {thumbnails.slice(currentIndex, currentIndex + 3).map(
                   (
                     src,
@@ -195,7 +194,7 @@ function ProductDetailInside() {
           {/* Right Section: Product Details */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h1 className="text-2xl font-bold mb-2">{products.name}</h1>
-            <p className="text-xl text-red-500">{products.price}</p>
+            <p className="text-xl text-red-500">฿{Number(products.price).toLocaleString()}</p>
 
             <div className="mt-4">
               <label htmlFor="quantity" className="block text-lg font-semibold">
@@ -209,7 +208,7 @@ function ProductDetailInside() {
                 >
                   -
                 </button>
-               
+
                 <input
                   type="number"
                   id="quantity"
@@ -230,7 +229,7 @@ function ProductDetailInside() {
             <button
               type="button"
               className="relative inline-flex justify-center font-semibold mt-6 w-full px-1.5 py-3 text-sm text-white bg-red-600 rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
-              onClick={isLoggedIn ? () => AddToCart(products.id,quantity) : () => navigate("/login")}
+              onClick={isLoggedIn ? () => AddToCart(products.id, quantity) : () => navigate("/login")}
 
             >
               <svg
@@ -245,10 +244,9 @@ function ProductDetailInside() {
             </button>
 
             {/* Additional Details */}
-            <div className="mt-4">
-              <h2 className="text-lg font-semibold">รายละเอียดสินค้า</h2>
-              <p className="mt-2">{products.description}</p>
-
+            <div className="mt-6 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+              <h2 className="text-xl font-bold text-gray-800 border-b border-gray-300 pb-2 mb-4">รายละเอียดสินค้า</h2>
+              <p className="mt-2 text-gray-600 leading-relaxed">{products.description}</p>
             </div>
           </div>
         </div>

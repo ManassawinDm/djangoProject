@@ -1,115 +1,150 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react'
+import Loading from "../components/Loading";
+import api from '../api';
+import { ACCESS_TOKEN } from '../constants';
+import CryptoJS from 'crypto-js';
+import { useLogo } from '../Context/CartContext';
+
+function decodeToken(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("Invalid token", error);
+    return null;
+  }
+}
 
 function CartList() {
   // State for items cart
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      name: "Labubu",
-      price: 6790,
-      quantity: 1,
-      image: "src/image/picForNav.jpg",
-    },
-    {
-      id: 2,
-      name: "Labubu",
-      price: 6790,
-      quantity: 1,
-      image: "src/image/picForNav.jpg",
-    },
-  ]);
+  const { logoAnimation } = useLogo();
+  console.log(logoAnimation)
+  const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
+  const token = localStorage.getItem(ACCESS_TOKEN);
+  const decode = isLoggedIn ? decodeToken(token) : null;
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const SECRET_KEY = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_SECRET_KEY.padEnd(32, ' '));
+  const encryptParam = (param) => {
+    if (!param) {
+      throw new Error('Parameter is undefined or null');
+    }
+    const encrypted = CryptoJS.AES.encrypt(param, SECRET_KEY, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    }).toString();
+    return encodeURIComponent(encrypted);
+  };
 
-  // update qty of prod
+  useEffect(() => {
+    if (isLoggedIn) {
+      getProduct();
+    }
+  }, [logoAnimation]);
+
+  const getProduct = async () => {
+    try {
+      const userId = decode.user_id.toString();
+      const encodedUserId = encryptParam(userId);
+
+      const res = await api.get('/cartlist/', {
+        params: { user_id: encodedUserId },
+      });
+      const data = res.data.cart_items.map(item => ({ ...item, selected: true }));
+      setProducts(data);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setProducts(prevItems =>
+      prevItems.map(item =>
+        item.product.id === id ? { ...item, selected: !item.selected } : item
+      )
+    );
+  };
+
   const updateItemQuantity = (id, change) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(item.quantity + change, 1) } // ปรับจำนวนให้ไม่ต่ำกว่า 1
+    setProducts(prevItems =>
+      prevItems.map(item =>
+        item.product.id === id
+          ? { ...item, quantity: Math.max(item.quantity + change, 1) }
           : item
       )
     );
   };
 
-  // increment qty of prod
-  const incrementQuantity = (id) => {
-    updateItemQuantity(id, 1); // เพิ่มจำนวน 1
-  };
+  const incrementQuantity = (id) => updateItemQuantity(id, 1);
+  const decrementQuantity = (id) => updateItemQuantity(id, -1);
 
-  //  decrement qty of prod
-  const decrementQuantity = (id) => {
-    updateItemQuantity(id, -1); // ลดจำนวน 1
-  };
-
-  // ฟังก์ชันคำนวณยอดรวมและจำนวนรายการทั้งหมด
   const calculateTotals = () => {
-    return items.reduce(
+    return products.reduce(
       (totals, item) => {
-        totals.total += item.price * item.quantity; // คำนวณยอดรวม
-        totals.quantity += item.quantity; // คำนวณจำนวนสินค้า
-        return totals; // ส่งกลับค่า totals
+        if (item.selected) {
+          totals.total += item.product.price * item.quantity;
+          totals.quantity += item.quantity;
+        }
+        return totals;
       },
-      { total: 0, quantity: 0 } // ค่าเริ่มต้น
+      { total: 0, quantity: 0 }
     );
   };
 
-  // ใช้ calculateTotals ในการดึงยอดรวมและจำนวนรายการ
   const { total, quantity } = calculateTotals();
 
+  if (loading) return <Loading />;
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">ตะกร้าของฉัน</h1>
-      <div className="bg-white shadow-md rounded-lg p-4 mb-4">
-        {/* Address Header */}
-        <div className="flex items-center mb-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 384 512"
-            className="h-6 w-6 text-white"
-          >
-            <path d="M384 192c0 87.4-117 243-168.3 307.2c-12.3 15.3-35.1 15.3-47.4 0C117 435 0 279.4 0 192C0 86 86 0 192 0S384 86 384 192z" />
-          </svg>
-          <h2 className="text-lg font-semibold ml-2">ที่อยู่ในการจัดส่ง</h2>
-        </div>
-
-        {/* Address Details */}
-        <p className="text-sm">คน (+66) เบอร์</p>
-        <p className="text-sm">
-          บ้านเก่ง คอนโด ยู เรสซิเดนท์ มาดามซี่ ชั้น27 บ้านเลขที่873/226 อาคาร B
-          ชั้น, แยกมาบยี่, เขตบางซื่อ, จังหวัด กรุงเทพฯ, 10800
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Section: Product List */}
         <div className="bg-white p-4 rounded-lg shadow-lg">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-center mb-4 border-b pb-2">
-              <input type="checkbox" className="mr-4" />
+          {products.map((item) => (
+            <div key={item.product.id} className="flex items-center mb-4 border-b pb-2">
+              <input
+                type="checkbox"
+                className="mr-4"
+                checked={item.selected}
+                onChange={() => toggleSelect(item.product.id)}
+              />
               <img
-                src={item.image}
-                alt={item.name}
+                src={item.product.image_url}
+                alt={item.product.name}
                 className="h-24 w-24 object-cover rounded-lg"
               />
               <div className="flex-grow ml-4">
-                <h2 className="text-lg font-semibold">{item.name}</h2>
-                <p className="text-gray-600">ราคา: ฿{item.price}</p>
+                <h2 className="text-lg font-semibold">{item.product.name}</h2>
+                <p className="text-gray-600">ราคา: ฿{item.product.price}</p>
                 <div className="flex justify-between">
                   <div className="flex items-center space-x-2 mt-2">
                     <button
-                      onClick={() => decrementQuantity(item.id)}
+                      onClick={() => decrementQuantity(item.product.id)}
                       className="border border-gray-300 rounded-full px-2"
                     >
                       -
                     </button>
                     <span>{item.quantity}</span>
                     <button
-                      onClick={() => incrementQuantity(item.id)}
+                      onClick={() => incrementQuantity(item.product.id)}
                       className="border border-gray-300 rounded-full px-2"
                     >
                       +
                     </button>
                   </div>
-                  <a href="">ลบ</a>
+                  <button onClick={() => removeItem(item.product.id)} className="text-red-600 hover:text-red-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" className="w-5 h-5 fill-current">
+                      <path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                    </svg>
+                  </button>
+
+
                 </div>
               </div>
             </div>
@@ -118,7 +153,7 @@ function CartList() {
 
         {/* Right Section: Order Summary */}
         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-          <p className="mx-2 my-3">จำนวน: {quantity} รายการ</p>
+          <p className="mx-2 my-3">จำนวน: {products.length} รายการ</p>
           <hr />
           <div className=" my-3 flex justify-between">
             <h2 className="flex justify-items-center text-lg font-semibold">

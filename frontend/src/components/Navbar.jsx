@@ -348,7 +348,7 @@ function Navbar() {
             </button>
             <button
               type="button"
-              className="relative inline-flex items-center px-1.5 py-1.5 text-sm text-white bg-[#c12222] rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
+              className="relative inline-flex items-center px-1.5 py-1.5 text-sm text-white bg-none "
             >
               {logoAnimation ? (
                 <svg

@@ -88,7 +88,6 @@ class AddToCart(APIView):
     def post(self, request, *args, **kwargs):
         encoded_user_id = request.data.get('user_id')
         decoded_user_id = decode_query_param(encoded_user_id)
-        print("decoded_user_id",decoded_user_id)
         data = {
             "user_id": decoded_user_id,
             "product_id": request.data.get('product_id'),
@@ -108,12 +107,6 @@ class AddToCart(APIView):
         user_id = decode_query_param(encoded_user_id)
 
         cart_items = ShoppingCart.objects.filter(user_id=user_id)
-
-        # if not cart_items.exists():
-        #     return Response(
-        #         {'message': 'No items found in the cart for this user.'},
-        #         status=status.HTTP_404_NOT_FOUND
-        #     )
 
         serializer = ShoppingCartSerializer(cart_items, many=True)
         return Response(
@@ -148,6 +141,27 @@ class AddToCart(APIView):
         serializer = ShoppingCartSerializer(cart_item)
         return Response(
             {'message': 'Quantity updated successfully.', 'data': serializer.data},
+            status=status.HTTP_200_OK
+        )
+        
+class CartList(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, *args, **kwargs):
+        encoded_user_id = request.GET.get('user_id')
+        user_id = decode_query_param(encoded_user_id)
+        print("user_id",user_id)
+
+        cart_items = ShoppingCart.objects.filter(user_id=user_id)
+        
+        if not cart_items.exists():
+            return Response(
+                {'message': 'ไม่มีสินค้าในตะกร้า'},
+                status=status.HTTP_200_OK
+            )
+        
+        serializer = ShoppingCartSerializer(cart_items, many=True)
+        return Response(
+            {'cart_items': serializer.data},
             status=status.HTTP_200_OK
         )
 

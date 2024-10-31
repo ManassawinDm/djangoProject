@@ -94,3 +94,10 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in {self.user.username}'s cart"
+    
+class Image(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')  # Foreign key to Product
+    image_path = models.ImageField(upload_to='images/')  # Field for the image path
+
+    def __str__(self):
+        return f"Image for {self.product.name}"  # Display product name in the admin interface

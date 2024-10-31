@@ -1,51 +1,5 @@
 import React, { useState } from "react";
 
-// function AddressModal({ isOpen, onClose, onSubmit }) {
-//   const [addressInput, setAddressInput] = useState("");
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     onSubmit(addressInput); // Call the parent function to set the address
-//     setAddressInput(""); // Clear the input field
-//     onClose(); // Close the modal
-//   };
-
-//   if (!isOpen) return null; // Don't render anything if the modal is not open
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-//         <h2 className="text-xl font-semibold mb-4">เพิ่มที่อยู่ใหม่</h2>
-//         <form onSubmit={handleSubmit}>
-//           <input
-//             type="text"
-//             placeholder="ที่อยู่"
-//             value={addressInput}
-//             onChange={(e) => setAddressInput(e.target.value)}
-//             required
-//             className="border border-gray-300 rounded-md p-2 w-full mb-4"
-//           />
-//           <div className="flex justify-end">
-//             <button
-//               type="button"
-//               onClick={onClose}
-//               className="bg-gray-300 text-black rounded-md px-4 py-2 mr-2"
-//             >
-//               ยกเลิก
-//             </button>
-//             <button
-//               type="submit"
-//               className="bg-red-600 text-white rounded-md px-4 py-2"
-//             >
-//               บันทึก
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// } แบบเก่า
-
 function AddressModal({ isOpen, onClose }) {
   const [name, setName] = useState("");
   const [contactName, setContactName] = useState("");
@@ -76,7 +30,7 @@ function AddressModal({ isOpen, onClose }) {
 
   return (
     isOpen && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 font-sans">
         <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-xl font-semibold mb-4">เพิ่มที่อยู่ใหม่</h2>
           <form onSubmit={handleSubmit}>
@@ -180,10 +134,104 @@ function AddressModal({ isOpen, onClose }) {
   );
 }
 
+function PaymentModal({ isOpen, onClose }) {
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [isDefault, setIsDefault] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle payment form submission logic here
+    console.log({
+      cardNumber,
+      cardName,
+      expiryDate,
+      cvv,
+      isDefault,
+    });
+    onClose(); // Close modal after submission
+  };
+
+  return (
+    isOpen && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-xl font-semibold mb-4">ข้อมูลการชำระเงิน</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 gap-4">
+              <input
+                type="text"
+                placeholder="หมายเลขบัตรเครดิต"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value)}
+                required
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+              <input
+                type="text"
+                placeholder="ชื่อบนบัตร"
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value)}
+                required
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+              <div className="flex space-x-4">
+                <input
+                  type="text"
+                  placeholder="วันหมดอายุ (MM/YY)"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                  required
+                  className="border border-gray-300 rounded-md p-2 w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="CVV"
+                  value={cvv}
+                  onChange={(e) => setCvv(e.target.value)}
+                  required
+                  className="border border-gray-300 rounded-md p-2 w-full"
+                />
+              </div>
+              <div className="flex items-center mt-2">
+                <input
+                  type="checkbox"
+                  checked={isDefault}
+                  onChange={() => setIsDefault(!isDefault)}
+                  className="mr-2"
+                />
+                <label>ตั้งเป็นวิธีการชำระเงินเริ่มต้น</label>
+              </div>
+            </div>
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="bg-gray-300 text-black rounded-md px-4 py-2 mr-2"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="submit"
+                className="bg-red-600 text-white rounded-md px-4 py-2"
+              >
+                ชำระเงิน
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )
+  );
+}
+
 function Checkout() {
   const [address, setAddress] = useState("");
   const [coupon, setCoupon] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isModalPaymentOpen, setModalPaymentOpen] = useState(false);
 
   const totalAmount = 6790; // Example total amount
   const itemCount = 1; // Example item count
@@ -224,11 +272,18 @@ function Checkout() {
           ชั้น, แยกมาบยี่, เขตบางซื่อ, จังหวัด กรุงเทพฯ, 10800
         </p>
       </div>
+      {/* Address Modal */}
       <AddressModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleAddressSubmit}
       />
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={isModalPaymentOpen}
+        onClose={() => setModalPaymentOpen(false)}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Section: Delivery Address and Coupon */}
         <div className="bg-white p-4 rounded-lg shadow-md">
@@ -302,7 +357,7 @@ function Checkout() {
           <hr className="my-2" />
           <h3 className="text-lg font-semibold">ยอดรวม({itemCount})</h3>
           <p className="text-3xl font-semibold">฿{totalAmount}.00 THB</p>
-          <button className="bg-red-600 text-white rounded-full px-4 py-2 hover:bg-red-700 mt-4 w-full">
+          <button onClick={() => setModalPaymentOpen(true)} className="bg-red-600 text-white rounded-full px-4 py-2 hover:bg-red-700 mt-4 w-full">
             ชำระเงิน
           </button>
         </div>

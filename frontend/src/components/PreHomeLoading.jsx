@@ -25,7 +25,7 @@ function PreHome() {
     return (
         <div className="w-full grid grid-cols-5">
             <div className="grid col-start-2 col-end-5">
-                <h1 className="flex justify-start mt-10 mb-3 font-sans text-2xl text-[#e60021] font-bold">
+                <h1 className="flex justify-start mt-10 mb-3 text-2xl text-[#e60021] font-bold  ">
                     สินค้าใหม่
                 </h1>
                 {loading && (

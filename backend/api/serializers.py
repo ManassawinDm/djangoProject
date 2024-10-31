@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Note, Category, Product, Order, OrderItem, Payment, ShoppingCart
+from .models import Note, Category, Product, Order, OrderItem, Payment, ShoppingCart,Image
 
 class UserinfoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -148,4 +148,13 @@ class ShoppingCartSerializerPostAPI(serializers.ModelSerializer):
             raise serializers.ValidationError({'user_id': 'User not found.'})
 
         return data 
-        
+    
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image  # Specify the model
+        fields = ['id', 'product', 'image_path']  # List the fields to be serialized
+
+    def validate_image_path(self, value):
+        # Optional: Custom validation for the image path if needed
+        # For example, checking file size, type, etc.
+        return value

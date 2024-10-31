@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <div className="bg-gradient-to-r from-red-500 to-red-700 text-white py-4 ">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
-        <div className="text-sm">
+        <div className="text-sm ">
           &copy; {new Date().getFullYear()} CS Art Toy. All Rights Reserved.
         </div>
         <div className="space-x-4">
