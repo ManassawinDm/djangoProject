@@ -10,6 +10,7 @@ import Footer from './components/Footer'
 import Loading from './components/Loading'
 import PreHomeLoading from "./components/PreHomeLoading"
 import CartList from "./pages/CartList"
+import Checkout from "./pages/CheckoutPayment"
 import AdminNavbar from './components/AdminNavbar'
 import AdminFooter from './components/AdminFooter'
 import ManageProduct from './pages/AdminPage/ManageProduct'
@@ -35,71 +36,72 @@ function isAdmin() {
 function App() {
   return (
     <LogoProvider>
-    <BrowserRouter>
-      {/* เลือก Navbar ตามสิทธิ์ */}
-      {isAdmin() ? <AdminNavbar /> : <Navbar />}
-      <Routes>
-        {/* Route สำหรับผู้ใช้ทั่วไป */}
-        {!isAdmin() ? (
-          <>
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <PreHome />
-                </ProtectedRoute> 
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <Suspense fallback={<PreHomeLoading />}>
-                  <PreHome />
-                </Suspense>
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/logout" element={<Logout />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/loading" element={<PreHomeLoading />} />
-            <Route
-              path="/product"
-              element={
-                <Suspense fallback={<Loading />}>
-                  <ProductDetail />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/series"
-              element={
-                <Suspense fallback={<Loading />}>
-                  <Type />
-                </Suspense>
-              }
-            />
-            <Route path="*" element={<Notfound />} />
-          </>
-        ) : (
-          // Route สำหรับ Admin
-          <>
-            {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
-            {/* <Route path="/admin/settings" element={<AdminSettings />} /> */}
-            <Route path="/admin/products" element={<ManageProduct />} />
-            <Route path="/product" element={<EditProduct />} />
-            <Route path="/admin/add-product" element={<AddProduct />} />
-
-            
-      
-            {/* <Route path="*" element={<Navigate to="/admin/dashboard" />} /> */}
-          </>
-        )}
-      </Routes>
-      {/* เลือก Footer ตามสิทธิ์ */}
-      {isAdmin() ? <AdminFooter /> : <Footer />}
-    </BrowserRouter>
+      <BrowserRouter>
+        <div className="flex flex-col min-h-screen">
+          {/* เลือก Navbar ตามสิทธิ์ */}
+          {isAdmin() ? <AdminNavbar /> : <Navbar />}
+          <div className="flex-grow pb-10">
+            <Routes>
+              {/* Route สำหรับผู้ใช้ทั่วไป */}
+              {!isAdmin() ? (
+                <>
+                  <Route
+                    path="/home"
+                    element={
+                      <ProtectedRoute>
+                        <PreHome />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/"
+                    element={
+                      <Suspense fallback={<PreHomeLoading />}>
+                        <PreHome />
+                      </Suspense>
+                    }
+                  />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/logout" element={<Logout />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/loading" element={<PreHomeLoading />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/cartlist" element={<CartList />} />
+                  <Route
+                    path="/product"
+                    element={
+                      <Suspense fallback={<Loading />}>
+                        <ProductDetail />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/series"
+                    element={
+                      <Suspense fallback={<Loading />}>
+                        <Type />
+                      </Suspense>
+                    }
+                  />
+                  <Route path="*" element={<Notfound />} />
+                </>
+              ) : (
+                // Route สำหรับ Admin
+                <>
+                  <Route path="/admin/products" element={<ManageProduct />} />
+                  <Route path="/product" element={<EditProduct />} />
+                  <Route path="/admin/add-product" element={<AddProduct />} />
+                </>
+              )}
+            </Routes>
+          </div>
+          {/* เลือก Footer ตามสิทธิ์ */}
+          {isAdmin() ? <AdminFooter /> : <Footer />}
+        </div>
+      </BrowserRouter>
     </LogoProvider>
-  )
+  );
+  
 }
 
 export default App
