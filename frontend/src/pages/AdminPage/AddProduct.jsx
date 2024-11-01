@@ -10,7 +10,7 @@ function AddProduct() {
         price: '',
         stock: '',
         category: '',
-        images: [] // Store uploaded image paths here
+        images: []
     });
 
     const [selectedImages, setSelectedImages] = useState([]);
@@ -20,33 +20,48 @@ function AddProduct() {
     useEffect(() => {
         getCategory();
     }, [])
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProduct((prev) => ({
+    
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProduct((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+    const onDrop = async (acceptedFiles) => {
+        const formData = new FormData();
+        acceptedFiles.forEach((file) => formData.append('images', file));
+    
+        try {
+          const response = await api.post('/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
+          const imagePaths = response.data.paths; // Assuming backend returns paths in an array format
+          setProduct((prev) => ({
             ...prev,
-            [name]: value
-        }));
-    };
-
-    const onDrop = (acceptedFiles) => {
-        const imageNames = acceptedFiles.map(file => file.name); // Get file names
-
-        // Update the state with the filenames
-        setProduct((prev) => ({
+            images: [...prev.images, ...imagePaths]
+          }));
+          
+          // Show previews
+          setSelectedImages((prev) => [
             ...prev,
-            images: [...prev.images, ...imageNames]
-        }));
-
-        // Optional: Show previews
-        const imagePreviews = acceptedFiles.map(file => URL.createObjectURL(file));
-        setSelectedImages((prev) => [...prev, ...imagePreviews]);
-    };
-
-    const { getRootProps, getInputProps } = useDropzone({
+            ...acceptedFiles.map((file) => URL.createObjectURL(file))
+          ]);
+        } catch (error) {
+          console.error("Failed to upload images:", error);
+          alert("Error uploading images");
+        }
+      };
+    
+      const { getRootProps, getInputProps } = useDropzone({
         onDrop,
-        accept: 'image/*', // Accept only image files
-        multiple: true // Allow multiple files
-    });
+        accept: 'image/*',
+        multiple: true
+      });
 
     const handleSave = async () => {
         console.log(product)
@@ -130,21 +145,25 @@ function AddProduct() {
             </div>
 
 
-            <div className="mb-4" {...getRootProps({ className: 'border border-dashed border-gray-300 p-4 text-center cursor-pointer' })}>
-                <input {...getInputProps()} />
-                <p className="text-gray-500">ลากและวางรูปภาพที่นี่ หรือคลิกเพื่อเลือกไฟล์ (สามารถเลือกได้หลายรูป)</p>
-            </div>
-
-            {/* Preview selected images */}
-            <div className="flex flex-wrap">
-                {selectedImages.map((image, index) => (
-                    <img
-                        key={index}
-                        src={image}
-                        alt={`Preview ${index}`}
-                        className="h-16 w-16 object-cover rounded mr-2 mb-2"
-                    />
-                ))}
+            <div className="mb-4">
+                <label className="block text-gray-700 font-semibold mb-1">รูปภาพ</label>
+                <div
+                    {...getRootProps()}
+                    className="w-full p-6 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-600 cursor-pointer hover:bg-gray-50"
+                >
+                    <input {...getInputProps()} />
+                    <p>Drag & drop or click to select images</p>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-4">
+                    {selectedImages.map((image, index) => (
+                        <img
+                            key={index}
+                            src={image}
+                            alt="Selected preview"
+                            className="h-24 w-24 object-cover rounded-lg"
+                        />
+                    ))}
+                </div>
             </div>
 
             <div className="flex items-center justify-between mt-6">
