@@ -30,9 +30,15 @@ function ManageProduct() {
 
     return (
         <div className="w-full p-6">
-            <div>
-            <h1 className="text-2xl font-bold text-[#e60021] mb-5">จัดการสินค้า</h1>
-            <button>เพิ่มสินค้า</button>
+            <div className='flex justify-between items-center'>
+                <h1 className="text-2xl font-bold text-[#e60021] mb-5">จัดการสินค้า</h1>
+
+                <button
+                    className="bg-[#e60021] text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-[#bf001a] transition-colors duration-200"
+                    onClick={() => navigate('/admin/add-product')}
+                >
+                    เพิ่มสินค้า
+                </button>
             </div>
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
@@ -63,8 +69,8 @@ function ManageProduct() {
                                         />
                                     </td>
                                     <td className="p-4">
-                                        <button 
-                                            
+                                        <button
+
                                             className="text-[#9f6f00] hover:underline"
                                         >
                                             {product.name}
