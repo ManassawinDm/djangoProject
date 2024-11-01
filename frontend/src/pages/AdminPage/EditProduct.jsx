@@ -25,7 +25,7 @@ function EditProduct() {
         try {
             const res = await api.post("/product/", { productId })
             setProduct(res.data)
-            console.log(es.data)
+            
             setLoading(false)
         } catch (err) {
             alert("Error fetching product: " + err.message)

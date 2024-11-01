@@ -101,3 +101,6 @@ class Image(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name}"  # Display product name in the admin interface
+    
+
+    
