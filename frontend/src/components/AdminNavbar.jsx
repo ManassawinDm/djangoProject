@@ -5,7 +5,7 @@ function AdminNavbar() {
   return (
     <nav className="bg-gray-800 p-4 flex items-center justify-between">
       <div className="text-white text-xl font-bold">
-        <Link to="/admin/dashboard">Admin Dashboard</Link>
+        <Link to="/admin/dashboard">CS Admin</Link>
       </div>
       <ul className="flex space-x-6">
         <li>
