@@ -17,6 +17,7 @@ import ManageProduct from './pages/AdminPage/ManageProduct'
 import EditProduct from './pages/AdminPage/EditProduct'
 import AddProduct from './pages/AdminPage/AddProduct'
 import { LogoProvider } from './Context/CartContext'
+import AdminHome from './pages/AdminPage/AdminHome'
 
 const ProductDetail = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));
@@ -29,8 +30,8 @@ function Logout() {
 
 // ฟังก์ชันตรวจสอบสถานะ Admin
 function isAdmin() {
-  // return true
-  return localStorage.getItem('isAdmin') === 'true'; // หรือเงื่อนไขที่เหมาะสม
+  return true
+  // return localStorage.getItem('isAdmin') === 'true'; // หรือเงื่อนไขที่เหมาะสม
 }
 
 function App() {
@@ -91,6 +92,9 @@ function App() {
                   <Route path="/admin/products" element={<ManageProduct />} />
                   <Route path="/product" element={<EditProduct />} />
                   <Route path="/admin/add-product" element={<AddProduct />} />
+                  <Route path="*" element={<AdminHome />} />
+
+                  
                 </>
               )}
             </Routes>
