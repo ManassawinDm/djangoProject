@@ -60,6 +60,15 @@ function Navbar() {
     try {
       const res = await api.post("/userinfo/", { user_id: decode.user_id });
       const data = res.data;
+      console.log(data.permission_user)
+      if (data.permission_user) {
+        localStorage.setItem('permission_user', data?.permission_user);
+        navigate('/home');
+      } else {
+        navigate('/login');
+      }
+
+
       setUserInfo(data);
     } catch (err) {
       console.error(err);
@@ -87,6 +96,7 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
+    localStorage.removeItem('permission_user');
     navigate('/login');
   };
 
