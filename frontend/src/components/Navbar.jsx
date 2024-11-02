@@ -62,7 +62,6 @@ function Navbar() {
       const data = res.data;
       if (data.permission_user) {
         localStorage.setItem('permission_user', data?.permission_user);
-        navigate('/home');
       } else {
         navigate('/login');
       }
