@@ -10,6 +10,10 @@ from decouple import config
 from Crypto.Cipher import AES
 import base64
 import urllib.parse
+from rest_framework.parsers import MultiPartParser
+import os
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 SECRET_KEY = config('SECRET_KEY').ljust(32).encode('utf-8')
 def decode_query_param(encrypted_param): 
@@ -237,3 +241,16 @@ class TypeListView(APIView):
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)  # Return all products as JSON
+    
+class UploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        images = request.FILES.getlist('images')
+        image_paths = []
+        fs = FileSystemStorage()
+
+        for image in images:
+            filename = fs.save(image.name, image)
+            image_paths.append(fs.url(filename))
+
+        return Response({'paths': image_paths}, status=status.HTTP_201_CREATED)
+    
