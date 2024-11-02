@@ -28,11 +28,12 @@ function Logout() {
   return <Navigate to="/login" />
 }
 
-// ฟังก์ชันตรวจสอบสถานะ Admin
+
 function isAdmin() {
-  return true
-  // return localStorage.getItem('isAdmin') === 'true'; // หรือเงื่อนไขที่เหมาะสม
+  return localStorage.getItem('permission_user') === '3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18';
 }
+
+
 
 function App() {
   return (

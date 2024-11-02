@@ -2,10 +2,21 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Note, Category, Product, Order, OrderItem, Payment, ShoppingCart,Image
 
+import hashlib
+from rest_framework import serializers
+from django.contrib.auth.models import User
+
 class UserinfoSerializer(serializers.ModelSerializer):
+    permission_user = serializers.SerializerMethodField()  # เปลี่ยนชื่อฟิลด์เป็น superuser_hash
+
     class Meta:
         model = User
-        fields = ["email"]
+        fields = ["email", "permission_user"]
+
+    def get_permission_user(self, obj):
+        return hashlib.sha256(str(obj.is_superuser).encode()).hexdigest()
+
+
 
 from rest_framework import serializers
 from .models import ShoppingCart
