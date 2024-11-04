@@ -4,25 +4,25 @@ import 'react-lazy-load-image-component/src/effects/blur.css'
 import api from '../../api'
 import { useNavigate } from 'react-router-dom'
 
-function ManageProduct() {
-    const [products, setProducts] = useState([])
+function ManageCategories() {
+    const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
 
     useEffect(() => {
-        getProduct()
+        getCategories()
     }, [])
 
-    const handleProductClick = (productID) => {
-        navigate(`/product?productId=${productID}`)
+    const handleCategoryClick = (categoryId) => {
+        navigate(`/Categories?CategoriesId=${categoryId}`)
     }
 
-    const getProduct = async () => {
+    const getCategories = async () => {
         try {
-            const res = await api.get("/")
-            setProducts(res.data)
+            const res = await api.get("category/")
+            setCategories(res.data)
         } catch (err) {
-            console.error("Failed to load products:", err)
+            console.error("Failed to load categories:", err)
         } finally {
             setLoading(false)
         }
@@ -31,23 +31,21 @@ function ManageProduct() {
     return (
         <div className="w-full p-6">
             <div className='flex justify-between items-center'>
-                <h1 className="text-2xl font-bold text-[#e60021] mb-5">จัดการสินค้า</h1>
+                <h1 className="text-2xl font-bold text-[#e60021] mb-5">จัดการหมวดหมู่</h1>
 
                 <button
                     className="bg-[#e60021] text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-[#bf001a] transition-colors duration-200"
-                    onClick={() => navigate('/admin/add-product')}
+                    onClick={() => navigate('/admin/add-category')}
                 >
-                    เพิ่มสินค้า
+                    เพิ่มหมวดหมู่
                 </button>
             </div>
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
                     <thead className="bg-gray-100 border-b">
                         <tr>
-                            <th className="p-4 font-semibold text-gray-600">รูปสินค้า</th>
-                            <th className="text-left p-4 font-semibold text-gray-600">ชื่อสินค้า</th>
-                            <th className="text-left p-4 font-semibold text-gray-600">ราคา</th>
-                            <th className="text-left p-4 font-semibold text-gray-600">ของคงเหลือ</th>
+                            <th className="p-4 font-semibold text-gray-600">รูปหมวดหมู่</th>
+                            <th className="text-left p-4 font-semibold text-gray-600">ชื่อหมวดหมู่</th>
                             <th className="text-left p-4 font-semibold text-gray-600">ยอดขาย</th>
                             <th className="p-4 font-semibold text-gray-600">จัดการ</th>
                         </tr>
@@ -57,29 +55,22 @@ function ManageProduct() {
                             <tr>
                                 <td colSpan="6" className="text-center p-6 text-gray-500">กำลังโหลดข้อมูล...</td>
                             </tr>
-                        ) : products.length > 0 ? (
-                            products.map((product) => (
-                                <tr key={product.id} className="border-b hover:bg-gray-50" onClick={() => handleProductClick(product.id)}>
+                        ) : categories.length > 0 ? (
+                            categories.map((category) => (
+                                <tr key={category.id} className="border-b hover:bg-gray-50" onClick={() => handleCategoryClick(category.id)}>
                                     <td className="p-4">
                                         <LazyLoadImage
                                             effect="blur"
-                                            // src={`../${product.image_url}` || '/placeholder.jpg'}
-                                            src={`http://127.0.0.1:8000${product.image_url}`}
-
-                                            alt={product.name}
+                                            src={`http://127.0.0.1:8000${category.image_url}`}
+                                            alt={category.name}
                                             className="w-16 h-16 object-cover rounded"
                                         />
                                     </td>
                                     <td className="p-4">
-                                        <button
-
-                                            className="text-[#9f6f00] hover:underline"
-                                        >
-                                            {product.name}
+                                        <button className="text-[#9f6f00] hover:underline">
+                                            {category.name}
                                         </button>
                                     </td>
-                                    <td className="p-4 text-[#d2001e] font-bold">฿{product.price}</td>
-                                    <td className="p-4 text-gray-700">{product.stock || 'N/A'}</td>
                                     <td className="p-4 text-gray-700">0</td> {/* Dummy sales data */}
                                     <td className="p-4">
                                         <button className="text-blue-600 hover:underline mr-2">แก้ไข</button>
@@ -88,7 +79,7 @@ function ManageProduct() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="6" className="text-center p-6 text-gray-500">ไม่พบสินค้าที่มีอยู่</td>
+                                <td colSpan="6" className="text-center p-6 text-gray-500">ไม่พบหมวดหมู่ที่มีอยู่</td>
                             </tr>
                         )}
                     </tbody>
@@ -98,4 +89,4 @@ function ManageProduct() {
     )
 }
 
-export default ManageProduct
+export default ManageCategories

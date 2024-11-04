@@ -18,6 +18,10 @@ import EditProduct from './pages/AdminPage/EditProduct'
 import AddProduct from './pages/AdminPage/AddProduct'
 import { LogoProvider } from './Context/CartContext'
 import AdminHome from './pages/AdminPage/AdminHome'
+import ManageCategories from './pages/AdminPage/ManageCategories'
+import EditCategories from './pages/AdminPage/EditCategories'
+import AddCategories from './pages/AdminPage/AddCategory'
+import ManageOrder from './pages/AdminPage/ManageOrder'
 
 const ProductDetail = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));
@@ -97,6 +101,10 @@ function App() {
                   <Route path="/product" element={<EditProduct />} />
                   <Route path="/admin/add-product" element={<AddProduct />} />
                   <Route path="*" element={<AdminHome />} />
+                  <Route path="/Categories" element={<EditCategories />} />
+                  <Route path="/admin/add-category" element={<AddCategories />} />
+                  <Route path="/admin/orders" element={<ManageOrder />} />
+                  <Route path="/manageCategories" element={<ManageCategories />} />
 
                   
                 </>

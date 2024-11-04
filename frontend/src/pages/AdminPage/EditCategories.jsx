@@ -3,16 +3,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../api';
 import { useDropzone } from 'react-dropzone';
 
-function EditProduct() {
+function EditCategories() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const productId = queryParams.get('productId');
+    const categoryId = queryParams.get('Categories'); // เปลี่ยนจาก productId เป็น categoryId
 
-    const [product, setProduct] = useState({
+    const [category, setCategory] = useState({
         name: '',
         description: '',
-        price: '',
-        stock: '',
         category: '',
         image_url: ''
     });
@@ -21,24 +19,24 @@ function EditProduct() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        getProduct();
+        // getCategory();
     }, []);
 
-    const getProduct = async () => {
-        try {
-            const res = await api.post('/product/', { productId });
-            setProduct(res.data);
-            setSelectedImage('http://127.0.0.1:8000'+res.data.image_url);
-            setLoading(false);
-        } catch (err) {
-            alert('Error fetching product: ' + err.message);
-            console.error(err);
-        }
-    };
+    // const getCategory = async () => {
+    //     try {
+    //         const res = await api.post('/category/', { categoryId });
+    //         setCategory(res.data);
+    //         setSelectedImage('http://127.0.0.1:8000' + res.data.image_url);
+    //         setLoading(false);
+    //     } catch (err) {
+    //         alert('Error fetching category: ' + err.message);
+    //         console.error(err);
+    //     }
+    // };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setProduct((prev) => ({
+        setCategory((prev) => ({
             ...prev,
             [name]: value
         }));
@@ -46,7 +44,7 @@ function EditProduct() {
 
     const onDrop = (acceptedFiles) => {
         const file = acceptedFiles[0];
-        setProduct((prev) => ({
+        setCategory((prev) => ({
             ...prev,
             image_url: file
         }));
@@ -63,43 +61,41 @@ function EditProduct() {
 
     const handleSave = async () => {
         const formData = new FormData();
-        formData.append('name', product.name);
-        formData.append('description', product.description);
-        formData.append('price', product.price);
-        formData.append('stock', product.stock);
-        formData.append('category', product.category);
+        formData.append('name', category.name);
+        formData.append('description', category.description);
+        formData.append('category', category.category);
 
-        if (product.image_url instanceof File) {
-            formData.append('image_url', product.image_url);
+        if (category.image_url instanceof File) {
+            formData.append('image_url', category.image_url);
         } else {
-            formData.append('image_url', product.image_url);
+            formData.append('image_url', category.image_url);
         }
 
         try {
-            await api.put(`/products/${productId}`, formData, {
+            await api.put(`/categories/${categoryId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            alert('Product updated successfully!');
-            navigate('/admin/manage-products');
+            alert('Category updated successfully!');
+            navigate('/admin/manage-categories'); // เปลี่ยนเส้นทางกลับไปหน้าหมวดหมู่
         } catch (error) {
-            console.error('Failed to update product:', error);
-            alert('Error updating product');
+            console.error('Failed to update category:', error);
+            alert('Error updating category');
         }
     };
 
     const handleDelete = async () => {
-        const confirmed = window.confirm("คุณแน่ใจหรือว่าต้องการลบสินค้านี้?");
+        const confirmed = window.confirm("คุณแน่ใจหรือว่าต้องการลบหมวดหมู่นี้?");
         if (!confirmed) return;
 
         try {
-            await api.delete(`/products/${productId}`);
-            alert('Product deleted successfully!');
-            navigate('/admin/manage-products');
+            await api.delete(`/categories/${categoryId}`);
+            alert('Category deleted successfully!');
+            navigate('/admin/manage-categories');
         } catch (error) {
-            console.error('Failed to delete product:', error);
-            alert('Error deleting product');
+            console.error('Failed to delete category:', error);
+            alert('Error deleting category');
         }
     };
 
@@ -107,24 +103,24 @@ function EditProduct() {
 
     return (
         <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
-            <h2 className="text-2xl font-bold text-[#e60021] mb-5">แก้ไขสินค้า</h2>
+            <h2 className="text-2xl font-bold text-[#e60021] mb-5">แก้ไขหมวดหมู่</h2>
 
             {selectedImage && (
                 <div className="mb-4">
                     <img
                         src={selectedImage}
-                        alt={product.name}
+                        alt={category.name}
                         className="w-full h-60 object-cover rounded"
                     />
                 </div>
             )}
 
             <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-1">ชื่อสินค้า</label>
+                <label className="block text-gray-700 font-semibold mb-1">ชื่อหมวดหมู่</label>
                 <input
                     type="text"
                     name="name"
-                    value={product.name}
+                    value={category.name}
                     onChange={handleChange}
                     className="w-full p-2 border border-gray-300 rounded"
                 />
@@ -134,47 +130,25 @@ function EditProduct() {
                 <label className="block text-gray-700 font-semibold mb-1">รายละเอียด</label>
                 <textarea
                     name="description"
-                    value={product.description}
+                    value={category.description}
                     onChange={handleChange}
                     className="w-full p-2 border border-gray-300 rounded"
                 />
             </div>
 
             <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-1">ราคา</label>
-                <input
-                    type="number"
-                    name="price"
-                    value={product.price}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                />
-            </div>
-
-            <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-1">ของคงเหลือ</label>
-                <input
-                    type="number"
-                    name="stock"
-                    value={product.stock}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded"
-                />
-            </div>
-
-            <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-1">หมวดหมู่</label>
+                <label className="block text-gray-700 font-semibold mb-1">หมวดหมู่หลัก</label>
                 <select
                     name="category"
-                    value={product.category}
+                    value={category.category}
                     onChange={handleChange}
                     className="w-full p-2 border border-gray-300 rounded"
                 >
                     <option value="">เลือกหมวดหมู่</option>
-                    <option value="1" selected={product.category === "1"}>SERIES</option>
-                    <option value="2" selected={product.category === "2"}>MEGA</option>
-                    <option value="3" selected={product.category === "3"}>TYPE</option>
-                    <option value="4" selected={product.category === "4"}>ACCESSORIES</option>
+                    <option value="1" selected={category.category === "1"}>SERIES</option>
+                    <option value="2" selected={category.category === "2"}>MEGA</option>
+                    <option value="3" selected={category.category === "3"}>TYPE</option>
+                    <option value="4" selected={category.category === "4"}>ACCESSORIES</option>
                 </select>
             </div>
 
@@ -200,11 +174,11 @@ function EditProduct() {
                     onClick={handleDelete}
                     className="px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600"
                 >
-                    ลบสินค้า
+                    ลบหมวดหมู่
                 </button>
             </div>
         </div>
     );
 }
 
-export default EditProduct;
+export default EditCategories;

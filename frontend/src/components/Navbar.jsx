@@ -142,7 +142,7 @@ function Navbar() {
                       <div className="flex flex-col items-center">
 
                         <img
-                          src={i.image_url}
+                          src={`http://127.0.0.1:8000${i.image_url}`}
                           alt={i.name}
                           className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
                         />

@@ -29,13 +29,8 @@ function AdminNavbar() {
           </Link>
         </li>
         <li>
-          <Link to="/admin/users" className="text-white hover:text-blue-400 font-medium">
-            Manage Users
-          </Link>
-        </li>
-        <li>
-          <Link to="/admin/settings" className="text-white hover:text-blue-400 font-medium">
-            Settings
+          <Link to="/manageCategories" className="text-white hover:text-blue-400 font-medium">
+            Manage Categories
           </Link>
         </li>
         <li>
