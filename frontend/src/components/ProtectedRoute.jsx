@@ -23,9 +23,11 @@ function ProtectedRoute({children}){
                 setisAuthorized(true)
             }else{
                 setisAuthorized(false)
-            }          
+            }  
+                  
         } catch (error) {
             console.log(error)
+            
         }
     }
 

@@ -78,22 +78,6 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'name', 'description', 'price', 'stock', 'category', 'image_url', 'created_at']
 
-# Serializer สำหรับการสั่งซื้อสินค้า
-class OrderSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)  # แสดง username แทนข้อมูลผู้ใช้ทั้งหมด
-    items = serializers.StringRelatedField(many=True, read_only=True)  # แสดงรายการสินค้า
-    
-    class Meta:
-        model = Order
-        fields = ['id', 'user', 'total_price', 'status', 'created_at', 'items']
-
-# Serializer สำหรับรายการสินค้าที่สั่งซื้อในแต่ละคำสั่งซื้อ
-class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)  # แสดงข้อมูลสินค้าที่สั่งซื้อ
-
-    class Meta:
-        model = OrderItem
-        fields = ['id', 'order', 'product', 'quantity', 'price']
 
 # Serializer สำหรับการชำระเงิน
 class PaymentSerializer(serializers.ModelSerializer):
@@ -159,11 +143,61 @@ class ShoppingCartSerializerPostAPI(serializers.ModelSerializer):
             raise serializers.ValidationError({'user_id': 'User not found.'})
 
         return data 
-class ProductSerializeradd(serializers.ModelSerializer):
+    
+class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image  # Specify the model
         fields = ['id', 'product', 'image_path']  # List the fields to be serialized
 
+    def validate_image_path(self, value):
+        # Optional: Custom validation for the image path if needed
+        # For example, checking file size, type, etc.
+        return value
+    
+# Serializer สำหรับการสั่งซื้อสินค้า
+class OrderSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(write_only=True)  
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user_id', 'total_price', 'status', 'created_at']
+        read_only_fields = ['status', 'created_at']
+
+    def validate_user_id(self, value):
+        if not User.objects.filter(id=value).exists():
+            raise serializers.ValidationError("User not found.")
+        return value
+
     def create(self, validated_data):
-        product = Product.objects.create(**validated_data)
-        return product
+        user_id = validated_data.pop('user_id')
+        user = User.objects.get(id=user_id)
+        order = Order.objects.create(user=user, **validated_data)
+        return order
+    
+    
+class OrderSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(write_only=True)  
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user_id', 'total_price', 'status', 'created_at']
+        read_only_fields = ['status', 'created_at']
+
+    def validate_user_id(self, value):
+        if not User.objects.filter(id=value).exists():
+            raise serializers.ValidationError("User not found.")
+        return value
+
+    def create(self, validated_data):
+        user_id = validated_data.pop('user_id')
+        user = User.objects.get(id=user_id)
+        order = Order.objects.create(user=user, **validated_data)
+        return order
+
+
+
+# Serializer สำหรับรายการสินค้าที่สั่งซื้อในแต่ละคำสั่งซื้อ
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['order', 'product', 'quantity', 'price']

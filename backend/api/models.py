@@ -65,7 +65,7 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
-
+    
 # การชำระเงิน
 class Payment(models.Model):
     CREDIT_CARD = 'Credit Card'
@@ -101,6 +101,18 @@ class Image(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name}"  # Display product name in the admin interface
+    
+class Address(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='address')
+    addressDetail = models.CharField(max_length=255)
+    province = models.CharField(max_length=100)
+    district = models.CharField(max_length=100)  # เขต
+    subdistrict = models.CharField(max_length=100)  # ตำบล
+    postal_code = models.CharField(max_length=10)  # รหัสไปรษณีย์
+    phone_number = models.CharField(max_length=15)  # เบอร์โทรศัพท์
+
+    def __str__(self):
+        return f"{self.user.username}'s Address"
     
 
     

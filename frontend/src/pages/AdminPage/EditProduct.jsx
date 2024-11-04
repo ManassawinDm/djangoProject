@@ -13,14 +13,13 @@ function EditProduct() {
         stock: '',
         category: '',
         image_url: ''
-    });
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    })
+    const [loading, setLoading] = useState(true)
+    const navigate = useNavigate()
 
     useEffect(() => {
-        getProduct();
-    }, []);
+        getProduct()
+    }, [])
 
     const getProduct = async () => {
         try {
@@ -39,69 +38,21 @@ function EditProduct() {
         setProduct((prev) => ({
             ...prev,
             [name]: value
-        }));
-    };
-
-    const onDrop = (acceptedFiles) => {
-        const file = acceptedFiles[0];
-        setProduct((prev) => ({
-            ...prev,
-            image_url: file
-        }));
-
-        const previewUrl = URL.createObjectURL(file);
-        setSelectedImage(previewUrl);
-    };
-
-    const { getRootProps, getInputProps } = useDropzone({
-        onDrop,
-        accept: 'image/*',
-        multiple: false
-    });
+        }))
+    }
 
     const handleSave = async () => {
-        const formData = new FormData();
-        formData.append('name', product.name);
-        formData.append('description', product.description);
-        formData.append('price', product.price);
-        formData.append('stock', product.stock);
-        formData.append('category', product.category);
-
-        if (product.image_url instanceof File) {
-            formData.append('image_url', product.image_url);
-        } else {
-            formData.append('image_url', product.image_url);
-        }
-
         try {
-            await api.put(`/products/${productId}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            alert('Product updated successfully!');
-            navigate('/admin/manage-products');
+            await api.put(`/products/${productId}`, product)
+            alert("Product updated successfully!")
+            navigate("/admin/manage-products")
         } catch (error) {
             console.error("Failed to update product:", error)
             alert("Error updating product")
         }
-    };
+    }
 
-    const handleDelete = async () => {
-        const confirmed = window.confirm("คุณแน่ใจหรือว่าต้องการลบสินค้านี้?");
-        if (!confirmed) return;
-
-        try {
-            await api.delete(`/products/${productId}`);
-            alert('Product deleted successfully!');
-            navigate('/admin/manage-products');
-        } catch (error) {
-            console.error('Failed to delete product:', error);
-            alert('Error deleting product');
-        }
-    };
-
-    if (loading) return <p>กำลังโหลดข้อมูล...</p>;
+    if (loading) return <p>กำลังโหลดข้อมูล...</p>
 
     return (
         <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">

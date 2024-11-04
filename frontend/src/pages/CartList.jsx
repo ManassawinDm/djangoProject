@@ -4,6 +4,8 @@ import api from '../api';
 import { ACCESS_TOKEN } from '../constants';
 import CryptoJS from 'crypto-js';
 import { useLogo } from '../Context/CartContext';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 function decodeToken(token) {
   try {
@@ -22,14 +24,18 @@ function decodeToken(token) {
 
 function CartList() {
   // State for items cart
-  const { logoAnimation } = useLogo();
-  console.log(logoAnimation)
+  const { triggerRemoved, isItemRemoved, logoAnimation } = useLogo();
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
   const token = localStorage.getItem(ACCESS_TOKEN);
   const decode = isLoggedIn ? decodeToken(token) : null;
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const SECRET_KEY = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_SECRET_KEY.padEnd(32, ' '));
+  const navigate = useNavigate();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const isSuccess = urlParams.get('success');
+
   const encryptParam = (param) => {
     if (!param) {
       throw new Error('Parameter is undefined or null');
@@ -41,11 +47,32 @@ function CartList() {
     return encodeURIComponent(encrypted);
   };
 
+  if (isSuccess === 'true') {
+    Swal.fire({
+        icon: 'success',
+        title: 'ชำระเงินสำเร็จ!',
+        text: 'ขอบคุณสำหรับการสั่งซื้อของคุณ!',
+        confirmButtonText: 'ตกลง'
+    }).then(() => {
+        window.history.replaceState(null, '', window.location.pathname);
+    });
+}else if (isCanceled === 'true'){
+    Swal.fire({
+      icon: 'error',
+      title: 'การชำระเงินถูกยกเลิก',
+      text: 'โปรดลองอีกครั้งหรือติดต่อฝ่ายบริการลูกค้า',
+      confirmButtonText: 'ตกลง'
+  }).then(() => {
+      // ลบพารามิเตอร์จาก URL หลังจากกดตกลง
+      window.history.replaceState(null, '', window.location.pathname);
+});
+}
+
   useEffect(() => {
     if (isLoggedIn) {
       getProduct();
     }
-  }, [logoAnimation]);
+  }, [logoAnimation,isItemRemoved]);
 
   const getProduct = async () => {
     try {
@@ -62,6 +89,70 @@ function CartList() {
       console.log(err);
     }
   };
+
+  const removeItem = async (product_id) => {
+    const userId = decode.user_id.toString();
+    const encodedUserId = encryptParam(userId);
+
+    try {
+        const res = await api.delete('/cart/', {
+            data: {
+                product_id: product_id,
+                user_id: encodedUserId
+            }
+        });
+        triggerRemoved()
+    } catch (error) {
+        console.error("Error removing item:", error);
+    }
+};
+
+const handleBuy = async () => {
+  const userId = decode.user_id.toString();
+  const encodedUserId = encryptParam(userId);
+  
+  try {
+    const orderResponse = await api.post('/order/', {
+      total_price: total,
+      user_id: encodedUserId,
+    });
+    const orderId = orderResponse.data.data.id;
+
+    const productsArray = products
+      .filter(item => item.selected)
+      .map(item => ({
+        product: item.product,
+        quantity: item.quantity,
+  }));
+    await api.post('/orderitem/', {
+      item: productsArray,
+      order_id: orderId,
+      user_id:encodedUserId
+    });
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Order Created',
+      text: 'Order completed',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate(`/checkout/${orderId}/`);
+      }
+    });
+
+    
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Order Error',
+        text: error.response.data.error, 
+      });
+    } else {
+      console.log(error)
+    }
+  }
+};
 
   const toggleSelect = (id) => {
     setProducts(prevItems =>
@@ -173,6 +264,7 @@ function CartList() {
           <button
             type="button"
             className="relative inline-flex justify-center font-semibold mt-6 w-full px-1.5 py-3 text-sm text-white bg-red-600 rounded-full hover:bg-red-800 focus:ring-4 focus:ring-red-300 transition duration-300"
+            onClick={() => handleBuy()}
           >
             <svg
               className="w-5 h-5 me-2"

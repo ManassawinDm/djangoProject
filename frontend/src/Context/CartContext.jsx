@@ -8,14 +8,20 @@ export const useLogo = () => {
 
 export const LogoProvider = ({ children }) => {
   const [logoAnimation, setLogoAnimation] = useState(false);
+  const [isItemRemoved, setIsItemRemoved] = useState(false); 
 
   const triggerLogoAnimation = () => {
     setLogoAnimation(true);
     setTimeout(() => setLogoAnimation(false), 250); 
   };
 
+  const triggerRemoved = () => {
+    setIsItemRemoved(true);
+    setTimeout(() => setIsItemRemoved(false), 1000);
+  };
+
   return (
-    <LogoContext.Provider value={{ logoAnimation, triggerLogoAnimation }}>
+    <LogoContext.Provider value={{ logoAnimation, triggerLogoAnimation, isItemRemoved, setIsItemRemoved, triggerRemoved }}>
       {children}
     </LogoContext.Provider>
   );

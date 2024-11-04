@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useNavigate } from 'react-router-dom';
 
-
 function AdminNavbar() {
   const handleLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
@@ -38,7 +37,7 @@ function AdminNavbar() {
           </Link>
         </li>
         <li>
-          <Link onClick={handleLogout}  className="text-white hover:text-red-400 font-medium">
+          <Link onClick={handleLogout} className="text-white hover:text-red-400 font-medium">
             Logout
           </Link>
         </li>
