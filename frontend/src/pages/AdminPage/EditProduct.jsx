@@ -16,23 +16,12 @@ function EditProduct() {
     });
     const [selectedImage, setSelectedImage] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [Category, setCategory] = useState([]);
-    const [selectedImages, setSelectedImages] = useState([]); // For preview
-
     const navigate = useNavigate();
 
     useEffect(() => {
         getProduct();
-        getCategory();
     }, []);
-    const getCategory = async () => {
-        try {
-            const res = await api.get("/category/");
-            setCategory(res.data);
-        } catch (err) {
-            console.log(err);
-        }
-    };
+
     const getProduct = async () => {
         try {
             const res = await api.post("/product/", { productId })
@@ -54,13 +43,14 @@ function EditProduct() {
     };
 
     const onDrop = (acceptedFiles) => {
+        const file = acceptedFiles[0];
         setProduct((prev) => ({
             ...prev,
-            images: [...prev.images, ...acceptedFiles] // Store files directly
+            image_url: file
         }));
 
-        const previews = acceptedFiles.map((file) => URL.createObjectURL(file));
-        setSelectedImages((prev) => [...prev, ...previews]);
+        const previewUrl = URL.createObjectURL(file);
+        setSelectedImage(previewUrl);
     };
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -70,15 +60,12 @@ function EditProduct() {
     });
 
     const handleSave = async () => {
-        let formData = new FormData();
-        
-        // Append text fields
+        const formData = new FormData();
         formData.append('name', product.name);
         formData.append('description', product.description);
         formData.append('price', product.price);
         formData.append('stock', product.stock);
         formData.append('category', product.category);
-
 
         if (product.image_url instanceof File) {
             formData.append('image_url', product.image_url);
@@ -87,7 +74,7 @@ function EditProduct() {
         }
 
         try {
-            await api.put(`/addproducts/${productId}/`, formData, {
+            await api.put(`/products/${productId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -99,14 +86,13 @@ function EditProduct() {
             alert("Error updating product")
         }
     };
-    
 
     const handleDelete = async () => {
         const confirmed = window.confirm("คุณแน่ใจหรือว่าต้องการลบสินค้านี้?");
         if (!confirmed) return;
 
         try {
-            await api.delete(`/addproducts/${productId}/`);
+            await api.delete(`/products/${productId}`);
             alert('Product deleted successfully!');
             navigate('/admin/manage-products');
         } catch (error) {
@@ -175,9 +161,10 @@ function EditProduct() {
                     className="w-full p-2 border border-gray-300 rounded"
                 >
                     <option value="">เลือกหมวดหมู่</option>
-                    {Category.map((item) => (
-                        <option key={item.id} value={item.id}>{item.name}</option>
-                    ))}
+                    <option value="1" selected={product.category === "1"}>SERIES</option>
+                    <option value="2" selected={product.category === "2"}>MEGA</option>
+                    <option value="3" selected={product.category === "3"}>TYPE</option>
+                    <option value="4" selected={product.category === "4"}>ACCESSORIES</option>
                 </select>
             </div>
 

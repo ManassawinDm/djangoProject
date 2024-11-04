@@ -159,14 +159,11 @@ class ShoppingCartSerializerPostAPI(serializers.ModelSerializer):
             raise serializers.ValidationError({'user_id': 'User not found.'})
 
         return data 
-    
 class ProductSerializeradd(serializers.ModelSerializer):
-    # Define category as a PrimaryKeyRelatedField to handle ForeignKey relations
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-
     class Meta:
         model = Image  # Specify the model
         fields = ['id', 'product', 'image_path']  # List the fields to be serialized
 
     def create(self, validated_data):
-        return Product.objects.create(**validated_data)
+        product = Product.objects.create(**validated_data)
+        return product
