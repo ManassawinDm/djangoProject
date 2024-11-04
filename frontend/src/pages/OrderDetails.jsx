@@ -25,11 +25,14 @@ const OrderDetails = () => {
           </p>
           <p
             className={`text-sm font-medium ${
-              order.status === "ชำระแล้ว"
-                ? "text-green-500"
-                : order.status === "รอชำระ"
+              order.status === "รอชำระ" || order.status === "รอดำเนินงาน"
                 ? "text-yellow-500"
-                : "text-red-500"
+                : order.status === "ชำระเงินเสร็จแล้ว" ||
+                  order.status === "จัดส่งแล้ว"
+                ? "text-green-500"
+                : order.status === "ยกเลิก"
+                ? "text-red-500"
+                : "text-black"
             }`}
           >
             สถานะ: {order.status}

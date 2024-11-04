@@ -8,28 +8,6 @@ const OrderOverview = () => {
     {
       id: "001",
       date: "2024-11-04",
-      status: "ชำระแล้ว",
-      totalAmount: 1500,
-      items: [
-        {
-          id: "1",
-          name: "Product A",
-          price: 500,
-          quantity: 1,
-          image: picForNav,
-        },
-        {
-          id: "2",
-          name: "Product B",
-          price: 1000,
-          quantity: 1,
-          image: picForNav,
-        },
-      ],
-    },
-    {
-      id: "002",
-      date: "2024-11-04",
       status: "รอชำระ",
       totalAmount: 1500,
       items: [
@@ -49,24 +27,63 @@ const OrderOverview = () => {
         },
       ],
     },
+
     {
       id: "003",
-      date: "2024-11-04",
-      status: "ไม่ชำระ",
-      totalAmount: 1500,
+      date: "2024-11-06",
+      status: "ชำระเงินเสร็จแล้ว",
+      totalAmount: 750,
       items: [
         {
-          id: "1",
-          name: "Product A",
+          id: "4",
+          name: "Product D",
+          price: 250,
+          quantity: 3,
+          image: picForNav,
+        },
+      ],
+    },
+    {
+      id: "004",
+      date: "2024-11-07",
+      status: "จัดส่งแล้ว",
+      totalAmount: 500,
+      items: [
+        {
+          id: "5",
+          name: "Product E",
           price: 500,
           quantity: 1,
           image: picForNav,
         },
+      ],
+    },
+    {
+      id: "005",
+      date: "2024-11-08",
+      status: "ยกเลิก",
+      totalAmount: 1200,
+      items: [
         {
-          id: "2",
-          name: "Product B",
-          price: 1000,
-          quantity: 1,
+          id: "6",
+          name: "Product F",
+          price: 600,
+          quantity: 2,
+          image: picForNav,
+        },
+      ],
+    },
+    {
+      id: "006",
+      date: "2024-11-09",
+      status: "รอดำเนินงาน",
+      totalAmount: 300,
+      items: [
+        {
+          id: "7",
+          name: "Product G",
+          price: 150,
+          quantity: 2,
           image: picForNav,
         },
       ],
@@ -84,14 +101,16 @@ const OrderOverview = () => {
             to={`/order/${order.id}`}
             key={order.id}
             state={{ order }}
-            className={`p-5 rounded-lg shadow-lg transition-shadow duration-300 
-                      ${
-                        order.status === "ชำระแล้ว"
-                          ? "bg-green-100 hover:ring-2 hover:ring-green-500 focus:ring-2 focus:ring-green-500"
-                          : order.status === "รอชำระ"
-                          ? "bg-yellow-100 hover:ring-2 hover:ring-yellow-500 focus:ring-2 focus:ring-yellow-500"
-                          : "bg-red-100 hover:ring-2 hover:ring-red-500 focus:ring-2 focus:ring-red-500"
-                      }`}
+            className={`p-5 rounded-lg shadow-lg transition-shadow duration-300 ${
+              order.status === "ชำระเงินเสร็จแล้ว" ||
+              order.status === "จัดส่งแล้ว"
+                ? "bg-green-100 hover:bg-green-100 hover:ring-2 hover:ring-green-500 focus:ring-2 focus:ring-green-500"
+                : order.status === "รอชำระ" || order.status === "รอดำเนินงาน"
+                ? "bg-yellow-100 hover:bg-yellow-100 hover:ring-2 hover:ring-yellow-500 focus:ring-2 focus:ring-yellow-500"
+                : order.status === "ยกเลิก"
+                ? "bg-red-100 hover:bg-red-100 hover:ring-2 hover:ring-red-500 focus:ring-2 focus:ring-red-500"
+                : "bg-white"
+            }`}
           >
             <div className="flex flex-col">
               <div className="mb-4">
@@ -103,11 +122,14 @@ const OrderOverview = () => {
                 </p>
                 <p
                   className={`text-sm font-medium ${
-                    order.status === "ชำระแล้ว"
-                      ? "text-green-500"
-                      : order.status === "รอชำระ"
+                    order.status === "รอชำระ" || order.status === "รอดำเนินงาน"
                       ? "text-yellow-500"
-                      : "text-red-500"
+                      : order.status === "ชำระเงินเสร็จแล้ว" ||
+                        order.status === "จัดส่งแล้ว"
+                      ? "text-green-500"
+                      : order.status === "ยกเลิก"
+                      ? "text-red-500"
+                      : "text-black"
                   }`}
                 >
                   สถานะ: {order.status}
