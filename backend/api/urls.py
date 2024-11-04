@@ -12,7 +12,8 @@ urlpatterns = [
     path("cartinfo/", views.CartInformation.as_view(), name="cart-Info"),
     path("cart/", views.AddToCart.as_view(), name="cart"),
     path("cartlist/", views.CartList.as_view(), name="cart-List"),
-    path("upload/",views.UploadView.as_view(),name="upload-image"),
+
+    path("addproducts/", views.AddProduct.as_view(), name="add-product"),
 
     path("notes/",views.NoteListCreate.as_view(),name="note-List"),
     path("notes/delete/<int:pk>",views.NoteDelecte.as_view(),name="delete-note"),

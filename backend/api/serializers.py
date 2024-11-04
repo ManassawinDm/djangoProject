@@ -159,13 +159,15 @@ class ShoppingCartSerializerPostAPI(serializers.ModelSerializer):
             raise serializers.ValidationError({'user_id': 'User not found.'})
 
         return data 
-    
-class ImageSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Image  # Specify the model
-        fields = ['id', 'product', 'image_path']  # List the fields to be serialized
+        model = Product
+        fields = ['name', 'description', 'price', 'stock', 'category', 'images']
 
-    def validate_image_path(self, value):
-        # Optional: Custom validation for the image path if needed
-        # For example, checking file size, type, etc.
-        return value
+    def create(self, validated_data):
+        images = validated_data.pop('images', [])
+        product = Product.objects.create(**validated_data)
+        
+        # Call a method to save images if needed
+        product.save_images(images)
+        return product

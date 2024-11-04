@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { useDropzone } from 'react-dropzone';
@@ -17,56 +17,62 @@ function AddProduct() {
     const [Category, setCategory] = useState([]);
 
     const navigate = useNavigate();
+    
     useEffect(() => {
         getCategory();
-    }, [])
+    }, []);
     
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProduct((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setProduct((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
-    const onDrop = async (acceptedFiles) => {
-        const formData = new FormData();
-        acceptedFiles.forEach((file) => formData.append('images', file));
-    
-        try {
-          const response = await api.post('/upload/', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-          
-          const imagePaths = response.data.paths; // Assuming backend returns paths in an array format
-          setProduct((prev) => ({
-            ...prev,
-            images: [...prev.images, ...imagePaths]
-          }));
-          
-          // Show previews
-          setSelectedImages((prev) => [
-            ...prev,
-            ...acceptedFiles.map((file) => URL.createObjectURL(file))
-          ]);
-        } catch (error) {
-          console.error("Failed to upload images:", error);
-          alert("Error uploading images");
-        }
-      };
-    
-      const { getRootProps, getInputProps } = useDropzone({
+    const onDrop = (acceptedFiles) => {
+        const promises = acceptedFiles.map((file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result); // This is the base64 string
+                reader.onerror = reject;
+                reader.readAsDataURL(file); // Read file as base64
+            });
+        });
+
+        Promise.all(promises)
+            .then((base64Images) => {
+                setProduct((prev) => ({
+                    ...prev,
+                    images: [...prev.images, ...base64Images]
+                }));
+                
+                // Show previews
+                setSelectedImages((prev) => [
+                    ...prev,
+                    ...base64Images
+                ]);
+            })
+            .catch((error) => {
+                console.error("Failed to read files:", error);
+                alert("Error reading files");
+            });
+    };
+
+    const { getRootProps, getInputProps } = useDropzone({
         onDrop,
         accept: 'image/*',
-        multiple: true
-      });
+        multiple: false
+    });
 
     const handleSave = async () => {
-        console.log(product)
+        const payload = {
+            ...product,
+            image_url: selectedImages[0] // สมมุติว่าคุณต้องการส่ง URL ของรูปภาพที่ถูกสร้างขึ้น
+        };
+    
         try {
-            await api.post('/products', product);
+            await api.post('/addproducts', payload);
             alert("Product added successfully!");
             navigate('/admin/manage-products');
         } catch (error) {
@@ -74,17 +80,17 @@ function AddProduct() {
             alert("Error adding product");
         }
     };
+    
 
     const getCategory = async () => {
         try {
             const res = await api.get("/category/");
             const data = res.data;
             setCategory(data);
-            // setLoading(false);
         } catch (err) {
             console.log(err);
         }
-    }
+    };
 
     return (
         <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
@@ -143,7 +149,6 @@ function AddProduct() {
                     ))}
                 </select>
             </div>
-
 
             <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-1">รูปภาพ</label>
