@@ -159,15 +159,11 @@ class ShoppingCartSerializerPostAPI(serializers.ModelSerializer):
             raise serializers.ValidationError({'user_id': 'User not found.'})
 
         return data 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializeradd(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'stock', 'category', 'images']
+        fields = ['name', 'description', 'price', 'stock', 'category', 'image_url']
 
     def create(self, validated_data):
-        images = validated_data.pop('images', [])
         product = Product.objects.create(**validated_data)
-        
-        # Call a method to save images if needed
-        product.save_images(images)
         return product

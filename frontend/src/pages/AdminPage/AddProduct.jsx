@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api';
+import api from '../../api'; // Import your API configuration for Axios
 import { useDropzone } from 'react-dropzone';
 
 function AddProduct() {
@@ -10,12 +10,11 @@ function AddProduct() {
         price: '',
         stock: '',
         category: '',
-        images: []
+        images: [] // Store the selected image files here
     });
 
-    const [selectedImages, setSelectedImages] = useState([]);
+    const [selectedImages, setSelectedImages] = useState([]); // For preview
     const [Category, setCategory] = useState([]);
-
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -31,32 +30,13 @@ function AddProduct() {
     };
 
     const onDrop = (acceptedFiles) => {
-        const promises = acceptedFiles.map((file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result); // This is the base64 string
-                reader.onerror = reject;
-                reader.readAsDataURL(file); // Read file as base64
-            });
-        });
+        setProduct((prev) => ({
+            ...prev,
+            images: [...prev.images, ...acceptedFiles] // Store files directly
+        }));
 
-        Promise.all(promises)
-            .then((base64Images) => {
-                setProduct((prev) => ({
-                    ...prev,
-                    images: [...prev.images, ...base64Images]
-                }));
-                
-                // Show previews
-                setSelectedImages((prev) => [
-                    ...prev,
-                    ...base64Images
-                ]);
-            })
-            .catch((error) => {
-                console.error("Failed to read files:", error);
-                alert("Error reading files");
-            });
+        const previews = acceptedFiles.map((file) => URL.createObjectURL(file));
+        setSelectedImages((prev) => [...prev, ...previews]);
     };
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -66,14 +46,27 @@ function AddProduct() {
     });
 
     const handleSave = async () => {
-        const payload = { 
-            
-            ...product,
-            image_url: selectedImages[0] // สมมุติว่าคุณต้องการส่ง URL ของรูปภาพที่ถูกสร้างขึ้น
-        };
-    
+        let formData = new FormData();
+        
+        // Append text fields
+        formData.append('name', product.name);
+        formData.append('description', product.description);
+        formData.append('price', product.price);
+        formData.append('stock', product.stock);
+        formData.append('category', product.category);
+        
+        // Append images (assuming single image upload as per your code)
+        if (product.images.length > 0) {
+            formData.append('image_url', product.images[0]); // Send the first image file
+        }
+
         try {
-            await api.post('/addproducts', payload);
+            await api.post('/addproducts/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                maxBodyLength: Infinity
+            });
             alert("Product added successfully!");
             navigate('/admin/manage-products');
         } catch (error) {
@@ -81,18 +74,15 @@ function AddProduct() {
             alert("Error adding product");
         }
     };
-    
 
     const getCategory = async () => {
         try {
             const res = await api.get("/category/");
-            const data = res.data;
-            setCategory(data);
+            setCategory(res.data);
         } catch (err) {
             console.log(err);
         }
     };
-
     return (
         <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
             <h2 className="text-2xl font-bold text-[#e60021] mb-5">เพิ่มสินค้าใหม่</h2>

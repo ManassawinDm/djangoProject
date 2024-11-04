@@ -61,7 +61,7 @@ function PreHome() {
                             <button onClick={() => handleImageClick(product.id)} className="w-full bg-slate-100">
                                 <LazyLoadImage
                                     effect="blur"
-                                    src={product.image_url}
+                                    src={`http://127.0.0.1:8000${product.image_url}`}
                                     alt={product.name}
                                     className="w-full h-48 object-cover"
                                 />
