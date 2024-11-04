@@ -66,7 +66,8 @@ function AddProduct() {
     });
 
     const handleSave = async () => {
-        const payload = {
+        const payload = { 
+            
             ...product,
             image_url: selectedImages[0] // สมมุติว่าคุณต้องการส่ง URL ของรูปภาพที่ถูกสร้างขึ้น
         };
