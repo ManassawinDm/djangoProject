@@ -32,7 +32,7 @@ function Logout() {
 function isAdmin() {
   // return true
   // return false
-  console.log("is admin:"+localStorage.getItem('permission_user') === '3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18')
+  console.log("is admin:",localStorage.getItem('permission_user') === '3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18')
   return localStorage.getItem('permission_user') === '3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18';
 }
 

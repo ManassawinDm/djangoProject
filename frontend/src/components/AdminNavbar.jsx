@@ -9,7 +9,8 @@ function AdminNavbar() {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
     localStorage.removeItem('permission_user');
-    navigate('/login');
+    // navigate('/login');
+    window.location.href = '/login';
   };
   return (
     <nav className="bg-gray-800 p-4 flex items-center justify-between">

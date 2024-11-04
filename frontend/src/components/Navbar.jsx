@@ -60,12 +60,6 @@ function Navbar() {
     try {
       const res = await api.post("/userinfo/", { user_id: decode.user_id });
       const data = res.data;
-      if (data.permission_user) {
-        localStorage.setItem('permission_user', data?.permission_user);
-      } else {
-        navigate('/login');
-      }
-
 
       setUserInfo(data);
     } catch (err) {
