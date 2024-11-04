@@ -49,7 +49,7 @@ function AddCategory() {
         // Append text fields
         formData.append('name', category.name);
         formData.append('description', category.description);
-        formData.append('parent_category', category.parent_category);
+        formData.append('type', category.parent_category);
 
         // Append images (assuming single image upload)
         if (category.images.length > 0) {

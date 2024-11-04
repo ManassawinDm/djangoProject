@@ -55,9 +55,8 @@ function AddProduct() {
         formData.append('stock', product.stock);
         formData.append('category', product.category);
         
-        // Append images (assuming single image upload as per your code)
         if (product.images.length > 0) {
-            formData.append('image_url', product.images[0]); // Send the first image file
+            formData.append('image_url', product.images[0]);
         }
 
         try {

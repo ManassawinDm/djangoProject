@@ -38,5 +38,10 @@ urlpatterns = [
 
     path("addproducts/", views.AddProduct.as_view(), name="add-product"),
     path('addproducts/<int:pk>/', views.AddProduct.as_view(), name='update-delete-product'),  # PUT and DELETE
+
+    path("addcategory/", views.AddCategory.as_view(), name="add-product"),
+    path('addcategory/<int:pk>/', views.AddCategory.as_view(), name='update-delete-product'),  # PUT and DELETE
+
+
 ]
 

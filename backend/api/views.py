@@ -272,13 +272,29 @@ class CartList(APIView):
 
 
 class ProductListCategory(APIView):
-    permission_classes = [AllowAny]  
+    permission_classes = [AllowAny]  # Allow access without authentication
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.all()
         serializer = CategorySerializer(category, many=True)
         return Response(serializer.data)  # ส่งข้อมูลสินค้าเป็น JSON
     
+    def post(self, request, *args, **kwargs):
+        category = request.data.get('categoryId')  # Get productId from request data
+        print(category)
+        if category:  # If productId is provided, filter by it
+            try:
+                product = Category.objects.get(id=category)  # Fetch the specific product
+                serializer = CategorySerializer(product)
+                return Response(serializer.data)  # Return the specific product
+            except Category.DoesNotExist:
+                return Response({"error": "Product not found"}, status=404)  # Handle product not found
+
+        # If no productId is provided, return all products
+        products = Category.objects.all()
+        serializer = CategorySerializer(products, many=True)
+        return Response(serializer.data)  # Return all products as JSON
+
 class ProductListView(APIView):
     permission_classes = [AllowAny]  # Allow access without authentication
 
@@ -598,3 +614,47 @@ class AddProduct(APIView):
         return Response({'message': 'Product deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
 
+
+class AddCategory(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        serializer = CategorySerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {'message': 'Product added successfully.', 'product': serializer.data},
+                status=status.HTTP_201_CREATED
+            )
+        
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            category = Category.objects.get(pk=pk)
+        except Category.DoesNotExist:
+            return Response({'error': 'Category not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CategorySerializer(category, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {'message': 'Category updated successfully.', 'category': serializer.data},
+                status=status.HTTP_200_OK
+            )
+
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            category = Category.objects.get(pk=pk)
+        except Category.DoesNotExist:
+            return Response({'error': 'Category not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        category.delete()
+        return Response({'message': 'Category deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)

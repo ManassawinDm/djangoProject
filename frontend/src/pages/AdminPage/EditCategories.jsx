@@ -6,7 +6,7 @@ import { useDropzone } from 'react-dropzone';
 function EditCategories() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const categoryId = queryParams.get('Categories'); // เปลี่ยนจาก productId เป็น categoryId
+    const categoryId = queryParams.get('CategoriesId'); 
 
     const [category, setCategory] = useState({
         name: '',
@@ -19,20 +19,22 @@ function EditCategories() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // getCategory();
+        getCategory();
     }, []);
 
-    // const getCategory = async () => {
-    //     try {
-    //         const res = await api.post('/category/', { categoryId });
-    //         setCategory(res.data);
-    //         setSelectedImage('http://127.0.0.1:8000' + res.data.image_url);
-    //         setLoading(false);
-    //     } catch (err) {
-    //         alert('Error fetching category: ' + err.message);
-    //         console.error(err);
-    //     }
-    // };
+    const getCategory = async () => {
+
+        try {
+            const res = await api.post('/category/', { categoryId });
+            console.log(res.data)
+            setCategory(res.data);
+            setSelectedImage('http://127.0.0.1:8000' + res.data.image_url);
+            setLoading(false);
+        } catch (err) {
+            alert('Error fetching category: ' + err.message);
+            console.error(err);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -63,34 +65,34 @@ function EditCategories() {
         const formData = new FormData();
         formData.append('name', category.name);
         formData.append('description', category.description);
-        formData.append('category', category.category);
-
+        formData.append('type', category.category);
+    
         if (category.image_url instanceof File) {
             formData.append('image_url', category.image_url);
         } else {
             formData.append('image_url', category.image_url);
         }
-
+    
         try {
-            await api.put(`/categories/${categoryId}`, formData, {
+            await api.put(`/addcategory/${categoryId}/`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
             alert('Category updated successfully!');
-            navigate('/admin/manage-categories'); // เปลี่ยนเส้นทางกลับไปหน้าหมวดหมู่
+            navigate('/admin/manage-categories');
         } catch (error) {
             console.error('Failed to update category:', error);
             alert('Error updating category');
         }
     };
-
+    
     const handleDelete = async () => {
         const confirmed = window.confirm("คุณแน่ใจหรือว่าต้องการลบหมวดหมู่นี้?");
         if (!confirmed) return;
-
+    
         try {
-            await api.delete(`/categories/${categoryId}`);
+            await api.delete(`/addcategory/${categoryId}/`);
             alert('Category deleted successfully!');
             navigate('/admin/manage-categories');
         } catch (error) {

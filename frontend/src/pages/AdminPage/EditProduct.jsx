@@ -56,14 +56,15 @@ function EditProduct() {
     };
 
     const onDrop = (acceptedFiles) => {
-        setProduct((prev) => ({
-            ...prev,
-            images: [...prev.images, ...acceptedFiles] // Store files directly
-        }));
-
+        console.log('Accepted files:', acceptedFiles); // ตรวจสอบว่ามีไฟล์หรือไม่
         const previews = acceptedFiles.map((file) => URL.createObjectURL(file));
         setSelectedImages((prev) => [...prev, ...previews]);
+        setProduct((prev) => ({
+            ...prev,
+            image_url: acceptedFiles[0] // ตรวจสอบว่าถูกต้องหรือไม่
+        }));
     };
+    
 
     const { getRootProps, getInputProps } = useDropzone({
         onDrop,
@@ -97,8 +98,12 @@ function EditProduct() {
             alert('Product updated successfully!');
             navigate('/admin/manage-products');
         } catch (error) {
-            console.error('Failed to update product:', error);
-            alert('Error updating product');
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: 'Error updating product', error,
+              });
+            // alert('Error updating product');
         }
     };
     
