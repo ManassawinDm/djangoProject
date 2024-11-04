@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useNavigate } from 'react-router-dom';
 
+
 function AdminNavbar() {
   const handleLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
     localStorage.removeItem('permission_user');
-    navigate('/login');
+    // navigate('/login');
+    window.location.href = '/login';
   };
   return (
     <nav className="bg-gray-800 p-4 flex items-center justify-between">
@@ -27,17 +29,12 @@ function AdminNavbar() {
           </Link>
         </li>
         <li>
-          <Link to="/admin/users" className="text-white hover:text-blue-400 font-medium">
-            Manage Users
+          <Link to="/manageCategories" className="text-white hover:text-blue-400 font-medium">
+            Manage Categories
           </Link>
         </li>
         <li>
-          <Link to="/admin/settings" className="text-white hover:text-blue-400 font-medium">
-            Settings
-          </Link>
-        </li>
-        <li>
-          <Link onClick={handleLogout} className="text-white hover:text-red-400 font-medium">
+          <Link onClick={handleLogout}  className="text-white hover:text-red-400 font-medium">
             Logout
           </Link>
         </li>

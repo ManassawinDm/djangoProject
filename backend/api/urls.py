@@ -30,7 +30,13 @@ urlpatterns = [
     path('create-checkout-session/',views.CreateStripeCheckoutSessionView.as_view(),name="create-checkout-session",
     ),
 
+    
+
     path('address/', views.CreateAddress.as_view(), name='create-address'),
     path('addressInfo/', views.GetAddress.as_view(), name='create-address'),
+
+
+    path("addproducts/", views.AddProduct.as_view(), name="add-product"),
+    path('addproducts/<int:pk>/', views.AddProduct.as_view(), name='update-delete-product'),  # PUT and DELETE
 ]
 

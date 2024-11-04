@@ -201,3 +201,14 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['order', 'product', 'quantity', 'price']
+
+class ProductSerializeradd(serializers.ModelSerializer):
+    # Define category as a PrimaryKeyRelatedField to handle ForeignKey relations
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
+
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'price', 'stock', 'category', 'image_url']
+
+    def create(self, validated_data):
+        return Product.objects.create(**validated_data)
