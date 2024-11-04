@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import UserSerializer , NoteSerializer, CategorySerializer, OrderItemSerializer, PaymentSerializer, ProductSerializer,ProductSerializeradd, OrderSerializer, ShoppingCartSerializer, UserinfoSerializer, CartinfoSerializer, ShoppingCartSerializerPostAPI
+from .serializers import UserSerializer , NoteSerializer, CategorySerializer, OrderItemSerializer, PaymentSerializer, ProductSerializer, OrderSerializer, ShoppingCartSerializer, UserinfoSerializer, CartinfoSerializer, ShoppingCartSerializerPostAPI
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Note, ShoppingCart, Payment, Category, Order, OrderItem, Product ,Category
 from rest_framework import status

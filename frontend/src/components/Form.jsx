@@ -4,25 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
 import Loading from "./Loading";
 
-
-
-function decodeToken(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error("Invalid token", error);
-    return null;
-  }
-}
-
-
-
-
 function Form({ route, method }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -42,37 +23,7 @@ function Form({ route, method }) {
       if (method === 'login') {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-
-
-
-
-
-
-         const decodeuserid =  decodeToken(res.data.access)
-         const user_id = decodeuserid['user_id'];
-
-         try {
-          const res = await api.post("/userinfo/", { user_id: user_id });
-          const data = res.data;
-          localStorage.setItem('permission_user', data?.permission_user);
-          if(localStorage.getItem('permission_user') === '3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18')
-          {
-            window.location.href = '/admin/users';
-          }
-          else{
-            navigate('/home');
-          }
-        } 
-        catch (err) {
-          console.error(err);
-        }
-       
-
-
-
-
-
-       
+        navigate('/home');
       } else {
         navigate('/login');
       }

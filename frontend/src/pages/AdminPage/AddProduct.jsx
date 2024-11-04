@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import api from '../../api'; // Import your API configuration for Axios
+import api from '../../api';
 import { useDropzone } from 'react-dropzone';
 
 function AddProduct() {
@@ -10,63 +10,63 @@ function AddProduct() {
         price: '',
         stock: '',
         category: '',
-        images: [] // Store the selected image files here
+        images: []
     });
 
-    const [selectedImages, setSelectedImages] = useState([]); // For preview
+    const [selectedImages, setSelectedImages] = useState([]);
     const [Category, setCategory] = useState([]);
+
     const navigate = useNavigate();
-    
     useEffect(() => {
         getCategory();
-    }, []);
+    }, [])
     
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProduct((prev) => ({
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProduct((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+    const onDrop = async (acceptedFiles) => {
+        const formData = new FormData();
+        acceptedFiles.forEach((file) => formData.append('images', file));
+    
+        try {
+          const response = await api.post('/upload/', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
+          const imagePaths = response.data.paths; // Assuming backend returns paths in an array format
+          setProduct((prev) => ({
             ...prev,
-            [name]: value
-        }));
-    };
-
-    const onDrop = (acceptedFiles) => {
-        setProduct((prev) => ({
+            images: [...prev.images, ...imagePaths]
+          }));
+          
+          // Show previews
+          setSelectedImages((prev) => [
             ...prev,
-            images: [...prev.images, ...acceptedFiles] // Store files directly
-        }));
-
-        const previews = acceptedFiles.map((file) => URL.createObjectURL(file));
-        setSelectedImages((prev) => [...prev, ...previews]);
-    };
-
-    const { getRootProps, getInputProps } = useDropzone({
+            ...acceptedFiles.map((file) => URL.createObjectURL(file))
+          ]);
+        } catch (error) {
+          console.error("Failed to upload images:", error);
+          alert("Error uploading images");
+        }
+      };
+    
+      const { getRootProps, getInputProps } = useDropzone({
         onDrop,
         accept: 'image/*',
-        multiple: false
-    });
+        multiple: true
+      });
 
     const handleSave = async () => {
-        let formData = new FormData();
-        
-        // Append text fields
-        formData.append('name', product.name);
-        formData.append('description', product.description);
-        formData.append('price', product.price);
-        formData.append('stock', product.stock);
-        formData.append('category', product.category);
-        
-        // Append images (assuming single image upload as per your code)
-        if (product.images.length > 0) {
-            formData.append('image_url', product.images[0]); // Send the first image file
-        }
-
+        console.log(product)
         try {
-            await api.post('/addproducts/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                maxBodyLength: Infinity
-            });
+            await api.post('/products', product);
             alert("Product added successfully!");
             navigate('/admin/manage-products');
         } catch (error) {
@@ -78,11 +78,14 @@ function AddProduct() {
     const getCategory = async () => {
         try {
             const res = await api.get("/category/");
-            setCategory(res.data);
+            const data = res.data;
+            setCategory(data);
+            // setLoading(false);
         } catch (err) {
             console.log(err);
         }
-    };
+    }
+
     return (
         <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
             <h2 className="text-2xl font-bold text-[#e60021] mb-5">เพิ่มสินค้าใหม่</h2>
@@ -140,6 +143,7 @@ function AddProduct() {
                     ))}
                 </select>
             </div>
+
 
             <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-1">รูปภาพ</label>

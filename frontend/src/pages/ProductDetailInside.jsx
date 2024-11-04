@@ -150,7 +150,7 @@ function ProductDetailInside() {
             <LazyLoadImage
               effect="blur"
               className="w-full h-auto rounded-lg shadow-md z-10"
-              src={`http://127.0.0.1:8000${products.image_url}`}
+              src={products.image_url}
               alt="Product"
             />
             <div className="flex justify-center mt-4">

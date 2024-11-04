@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import api from '../../api';
-import { useDropzone } from 'react-dropzone';
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import api from '../../api'
 
 function EditProduct() {
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const productId = queryParams.get('productId');
-
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+    const productId = queryParams.get('productId')
     const [product, setProduct] = useState({
         name: '',
         description: '',
@@ -37,18 +35,18 @@ function EditProduct() {
     };
     const getProduct = async () => {
         try {
-            const res = await api.post('/product/', { productId });
-            setProduct(res.data);
-            setSelectedImage('http://127.0.0.1:8000'+res.data.image_url);
-            setLoading(false);
+            const res = await api.post("/product/", { productId })
+            setProduct(res.data)
+            
+            setLoading(false)
         } catch (err) {
-            alert('Error fetching product: ' + err.message);
-            console.error(err);
+            alert("Error fetching product: " + err.message)
+            console.error(err)
         }
-    };
+    }
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value } = e.target
         setProduct((prev) => ({
             ...prev,
             [name]: value
@@ -97,8 +95,8 @@ function EditProduct() {
             alert('Product updated successfully!');
             navigate('/admin/manage-products');
         } catch (error) {
-            console.error('Failed to update product:', error);
-            alert('Error updating product');
+            console.error("Failed to update product:", error)
+            alert("Error updating product")
         }
     };
     
@@ -123,13 +121,9 @@ function EditProduct() {
         <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
             <h2 className="text-2xl font-bold text-[#e60021] mb-5">แก้ไขสินค้า</h2>
 
-            {selectedImage && (
+            {product.image_url && (
                 <div className="mb-4">
-                    <img
-                        src={selectedImage}
-                        alt={product.name}
-                        className="w-full h-60 object-cover rounded"
-                    />
+                    <img src={product.image_url} alt={product.name} className="w-full h-60 object-cover rounded" />
                 </div>
             )}
 
@@ -143,7 +137,6 @@ function EditProduct() {
                     className="w-full p-2 border border-gray-300 rounded"
                 />
             </div>
-
             <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-1">รายละเอียด</label>
                 <textarea
@@ -153,7 +146,6 @@ function EditProduct() {
                     className="w-full p-2 border border-gray-300 rounded"
                 />
             </div>
-
             <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-1">ราคา</label>
                 <input
@@ -164,7 +156,6 @@ function EditProduct() {
                     className="w-full p-2 border border-gray-300 rounded"
                 />
             </div>
-
             <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-1">ของคงเหลือ</label>
                 <input
@@ -175,7 +166,6 @@ function EditProduct() {
                     className="w-full p-2 border border-gray-300 rounded"
                 />
             </div>
-
             <div className="mb-4">
                 <label className="block text-gray-700 font-semibold mb-1">หมวดหมู่</label>
                 <select
@@ -192,32 +182,25 @@ function EditProduct() {
             </div>
 
             <div className="mb-4">
-                <label className="block text-gray-700 font-semibold mb-1">รูปภาพ</label>
-                <div
-                    {...getRootProps()}
-                    className="w-full p-6 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-600 cursor-pointer hover:bg-gray-50"
-                >
-                    <input {...getInputProps()} />
-                    <p>Drag & drop or click to select an image</p>
-                </div>
+                <label className="block text-gray-700 font-semibold mb-1">รูปภาพ URL</label>
+                <input
+                    type="text"
+                    name="image_url"
+                    value={product.image_url}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                />
             </div>
-
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex items-center justify-between">
                 <button
                     onClick={handleSave}
                     className="px-4 py-2 bg-[#4caf50] text-white font-semibold rounded hover:bg-[#43a047]"
                 >
                     บันทึก
                 </button>
-                <button
-                    onClick={handleDelete}
-                    className="px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600"
-                >
-                    ลบสินค้า
-                </button>
             </div>
         </div>
-    );
+    )
 }
 
-export default EditProduct;
+export default EditProduct

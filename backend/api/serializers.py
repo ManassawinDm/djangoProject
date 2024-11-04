@@ -165,8 +165,8 @@ class ProductSerializeradd(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
 
     class Meta:
-        model = Product
-        fields = ['name', 'description', 'price', 'stock', 'category', 'image_url']
+        model = Image  # Specify the model
+        fields = ['id', 'product', 'image_path']  # List the fields to be serialized
 
     def create(self, validated_data):
         return Product.objects.create(**validated_data)

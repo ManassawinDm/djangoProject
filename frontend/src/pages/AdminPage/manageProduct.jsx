@@ -63,9 +63,7 @@ function ManageProduct() {
                                     <td className="p-4">
                                         <LazyLoadImage
                                             effect="blur"
-                                            // src={`../${product.image_url}` || '/placeholder.jpg'}
-                                            src={`http://127.0.0.1:8000${product.image_url}`}
-
+                                            src={`../${product.image_url}` || '/placeholder.jpg'}
                                             alt={product.name}
                                             className="w-16 h-16 object-cover rounded"
                                         />

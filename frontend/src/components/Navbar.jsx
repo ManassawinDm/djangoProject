@@ -60,6 +60,12 @@ function Navbar() {
     try {
       const res = await api.post("/userinfo/", { user_id: decode.user_id });
       const data = res.data;
+      if (data.permission_user) {
+        localStorage.setItem('permission_user', data?.permission_user);
+      } else {
+        navigate('/login');
+      }
+
 
       setUserInfo(data);
     } catch (err) {
@@ -142,7 +148,7 @@ function Navbar() {
                       <div className="flex flex-col items-center">
 
                         <img
-                          src={`http://127.0.0.1:8000${i.image_url}`}
+                          src={i.image_url}
                           alt={i.name}
                           className="h-10 w-10 sm:h-16 sm:w-16 object-cover rounded-full mb-2 shadow-md"
                         />

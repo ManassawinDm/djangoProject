@@ -9,8 +9,7 @@ function AdminNavbar() {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
     localStorage.removeItem('permission_user');
-    // navigate('/login');
-    window.location.href = '/login';
+    navigate('/login');
   };
   return (
     <nav className="bg-gray-800 p-4 flex items-center justify-between">
@@ -29,8 +28,13 @@ function AdminNavbar() {
           </Link>
         </li>
         <li>
-          <Link to="/manageCategories" className="text-white hover:text-blue-400 font-medium">
-            Manage Categories
+          <Link to="/admin/users" className="text-white hover:text-blue-400 font-medium">
+            Manage Users
+          </Link>
+        </li>
+        <li>
+          <Link to="/admin/settings" className="text-white hover:text-blue-400 font-medium">
+            Settings
           </Link>
         </li>
         <li>
