@@ -35,6 +35,7 @@ function CartList() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const isSuccess = urlParams.get('success');
+  const isCanceled = urlParams.get('canceled');
 
   const encryptParam = (param) => {
     if (!param) {

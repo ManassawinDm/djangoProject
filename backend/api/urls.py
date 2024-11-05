@@ -14,6 +14,8 @@ urlpatterns = [
     path("cartlist/", views.CartList.as_view(), name="cart-List"),
     path("upload/",views.UploadView.as_view(),name="upload-image"),
 
+    path('fetch-order/', views.FetchOrder.as_view(), name='update-status'),
+    path("cancel-order/", views.CancelOrder.as_view(), name='cancel-order'),
     path("order/", views.CreateOrder.as_view(), name="create-order"),
     path("orderitem/", views.CreateOrderItem.as_view(), name="create-orderitem"),
     
@@ -30,7 +32,7 @@ urlpatterns = [
     path('create-checkout-session/',views.CreateStripeCheckoutSessionView.as_view(),name="create-checkout-session",
     ),
 
-    
+    path('status/', views.UpdateStatus.as_view(), name='update-status'),
 
     path('address/', views.CreateAddress.as_view(), name='create-address'),
     path('addressInfo/', views.GetAddress.as_view(), name='create-address'),

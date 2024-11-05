@@ -74,7 +74,8 @@ function App() {
                   <Route path="/logout" element={<Logout />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/loading" element={<PreHomeLoading />} />
-                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/checkout/:orderId" element={<Checkout />} />
+                  <Route path="/checkout/" element={<OrderOverview />} />
                   <Route path="/cartlist" element={<CartList />} />
                   <Route
                     path="/product"

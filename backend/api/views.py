@@ -52,7 +52,7 @@ class CreateStripeCheckoutSessionView(APIView):
 
     def post(self, request, *args, **kwargs):
         items = request.data.get("item", {}).get("items", [])  # Extract items
-
+        order = request.data.get("order")
 
         try:
             checkout_session = stripe.checkout.Session.create(
@@ -72,7 +72,7 @@ class CreateStripeCheckoutSessionView(APIView):
     ],
     payment_method_types=['card'],
     mode='payment',
-    success_url="http://localhost:5173/cartlist/?success=true",  # Example hardcoded success URL
+    success_url=f"http://localhost:5173/checkout/{order}/?success=true",  # Example hardcoded success URL
     cancel_url="http://localhost:5173/cartlist/?canceled=true",  # Example hardcoded cancel URL
 )
 
@@ -658,3 +658,68 @@ class AddCategory(APIView):
 
         category.delete()
         return Response({'message': 'Category deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    
+
+class FetchOrder(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        encoded_user_id = request.GET.get('user_id')
+        user_id = decode_query_param(encoded_user_id)  # ถอดรหัส user_id
+
+        try:
+            orders = Order.objects.filter(user_id=user_id)
+
+            serialized_orders = OrderSerializer(orders, many=True).data
+
+            return Response({'orders': serialized_orders}, status=status.HTTP_200_OK)
+
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class CancelOrder(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        order_id = request.data.get("order")
+
+        try:
+            order = Order.objects.get(id=order_id)
+
+            order.status = Order.CANCELLED
+            order.save()  
+
+            return Response({'message': 'Update Status successfully.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def get(self, request, *args, **kwargs):
+            print("ok")
+            return Response({'message': 'Update Status successfully.'}, status=status.HTTP_200_OK)
+
+
+class UpdateStatus(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        order_id = request.data.get("order_id")
+
+        try:
+            # ดึง Order ตาม ID
+            order = Order.objects.get(id=order_id)
+
+            # อัปเดตสถานะเป็น SHIPPED
+            order.status = Order.SHIPPED
+            order.save()  # บันทึกการเปลี่ยนแปลงในฐานข้อมูล
+
+            return Response({'message': 'Update Status successfully.'}, status=status.HTTP_200_OK)
+
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

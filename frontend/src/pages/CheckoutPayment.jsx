@@ -4,6 +4,7 @@ import Loading from "../components/Loading";
 import { useParams } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../constants';
 import CryptoJS from 'crypto-js';
+import { useNavigate } from 'react-router-dom';
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, useStripe, useElements, PaymentRequestButtonElement } from "@stripe/react-stripe-js";
 
@@ -176,10 +177,40 @@ function Checkout() {
   const [DataOrder, setDataOrder] = useState([]);
   const [DataOrderItem, setDataOrderItem] = useState([]);
   const [addressData, setAddressData] = useState([]);
+  const navigate = useNavigate();
 
   const isLoggedIn = !!localStorage.getItem(ACCESS_TOKEN);
   const token = localStorage.getItem(ACCESS_TOKEN);
   const decode = isLoggedIn ? decodeToken(token) : null;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const isSuccess = urlParams.get('success');
+
+  if (isSuccess === 'true') {
+    Swal.fire({
+        icon: 'success',
+        title: 'ชำระเงินสำเร็จ!',
+        text: 'ขอบคุณสำหรับการสั่งซื้อของคุณ!',
+        confirmButtonText: 'ตกลง'
+    }).then(async () => {
+        try {
+            const response = await api.put('/status/', { order_id: DataOrder.order.id });
+            
+            if (response.status === 200) {
+                console.log('สถานะอัปเดตสำเร็จ:', response.data);
+                window.history.replaceState(null, '', window.location.pathname);
+                
+                // Navigate to the checkout page after successfully updating the status
+                navigate("/checkout/");
+            } else {
+                console.error('การอัปเดตสถานะล้มเหลว:', response.data);
+            }
+        } catch (error) {
+            console.error("เกิดข้อผิดพลาดในการอัปเดตสถานะ:", error);
+        }
+    });
+}
+
 
 
   const encryptParam = (param) => {
@@ -198,7 +229,7 @@ function Checkout() {
 
   const handleClick = async () => {
     try {
-        const response = await api.post('/create-checkout-session/', { item: DataOrderItem });
+        const response = await api.post('/create-checkout-session/', { item: DataOrderItem ,order:DataOrder.order.id});
         if (response.data.url) {
             window.location.href = response.data.url;  // Redirect to Stripe checkout
         }
@@ -206,6 +237,42 @@ function Checkout() {
         console.error("Error creating Stripe checkout session:", error);
     }
 };
+
+const handleCancel = async () => {
+  try {
+    await api.put('/cancel-order/', { order: DataOrder.order.id });
+  } catch (error) {
+    console.error("Error canceling the order:", error);
+  }
+};
+
+const confirmCancel = () => {
+  Swal.fire({
+    title: 'คุณแน่ใจหรือไม่?',
+    text: "คุณต้องการยกเลิกคำสั่งซื้อหรือไม่",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'ใช่, ยกเลิกเลย!',
+    cancelButtonText: 'ไม่, เก็บไว้'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      handleCancel().then(() => { // Wait for handleCancel to complete
+        Swal.fire(
+          'ยกเลิกสำเร็จ!',
+          'คำสั่งซื้อของคุณถูกยกเลิกเรียบร้อยแล้ว',
+          'success'
+        ).then(() => {
+          navigate("/checkout/"); // Navigate after success alert is confirmed
+        });
+      });
+    }
+  });
+};
+
+
+
 
   
   useEffect(() => {
@@ -346,7 +413,7 @@ function Checkout() {
 
         {/* Right Section: Order Summary */}
         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-          <h2 className="text-lg font-semibold">ยอดรวม</h2>
+          <h2 className="text-ปส font-semibold">ออเดอร์ที่ {DataOrder.order.id}</h2>
           <div className="flex justify-between mt-2">
             <p className="text-gray-700">จำนวน: {DataOrderItem.items.length} รายการ</p>
           </div>
@@ -377,6 +444,12 @@ function Checkout() {
             disabled={!addressData || !addressData.address} // Disable the button if addressData or addressData.address is not available
           >
             ชำระเงิน
+      </button>
+      <button 
+          onClick={() => confirmCancel()} 
+          className="bg-white text-red-600 border border-red-600 rounded-full px-4 py-2 hover:bg-red-600 hover:text-white transition duration-200 mt-4 w-full"
+      >
+          ยกเลิก
       </button>
         </div>
       </div>
