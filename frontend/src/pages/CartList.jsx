@@ -207,7 +207,9 @@ const handleBuy = async () => {
                 onChange={() => toggleSelect(item.product.id)}
               />
               <img
-                src={item.product.image_url}
+                // src={item.product.image_url}
+              src={`http://127.0.0.1:8000${item.product.image_url}`}
+
                 alt={item.product.name}
                 className="h-24 w-24 object-cover rounded-lg"
               />

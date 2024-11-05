@@ -22,6 +22,8 @@ import ManageCategories from './pages/AdminPage/ManageCategories'
 import EditCategories from './pages/AdminPage/EditCategories'
 import AddCategories from './pages/AdminPage/AddCategory'
 import ManageOrder from './pages/AdminPage/ManageOrder'
+import OrderOverview from'./pages/OrderOverview'
+
 
 const ProductDetail = React.lazy(() => import('./pages/ProductDetailInside'));
 const PreHome = React.lazy(() => import('./pages/PreHome'));

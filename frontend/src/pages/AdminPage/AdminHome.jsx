@@ -12,7 +12,7 @@ function AdminHome() {
           <FaDollarSign className="text-green-500 text-4xl" />
           <div className="ml-4">
             <p className="text-sm text-gray-500">Total Sales</p>
-            <p className="text-lg font-semibold">$25,000</p>
+            <p className="text-lg font-semibold">$22,130</p>
           </div>
         </div>
         
@@ -20,7 +20,7 @@ function AdminHome() {
           <FaShoppingCart className="text-blue-500 text-4xl" />
           <div className="ml-4">
             <p className="text-sm text-gray-500">Orders</p>
-            <p className="text-lg font-semibold">1,200</p>
+            <p className="text-lg font-semibold">12</p>
           </div>
         </div>
         
@@ -28,7 +28,7 @@ function AdminHome() {
           <FaUsers className="text-purple-500 text-4xl" />
           <div className="ml-4">
             <p className="text-sm text-gray-500">Users</p>
-            <p className="text-lg font-semibold">900</p>
+            <p className="text-lg font-semibold">15</p>
           </div>
         </div>
         
@@ -36,7 +36,7 @@ function AdminHome() {
           <FaBox className="text-yellow-500 text-4xl" />
           <div className="ml-4">
             <p className="text-sm text-gray-500">Inventory</p>
-            <p className="text-lg font-semibold">1,500 items</p>
+            <p className="text-lg font-semibold">435 items</p>
           </div>
         </div>
       </div>
